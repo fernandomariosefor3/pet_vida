@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.fernandomariosefor3.twa",
+        "sha256_cert_fingerprints": ["BA:68:4C:07:DD:FA:31:F9:87:D7:C1:C5:40:AC:ED:71:2E:22:C3:3E:1E:FD:1E:EA:C7:E4:8E:9F:F3:BE:71:8D"]
+      }
+    }]
