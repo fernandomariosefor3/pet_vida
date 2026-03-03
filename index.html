@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PetVida - Cuidados com seu Pet</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FF6B35">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PetVida">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<meta name="description" content="Gerencie a saude, agenda e cuidados do seu pet com inteligencia artificial.">
+<!-- APP_SETTINGS_START
+{"costLabel":"[usd_milli_cents=50000]+ points","rateCard":"| Feature | Cost |\n|---------|------|\n| AI Health Analysis | [usd_milli_cents=50000] points |\n| AI Diet Plan | [usd_milli_cents=50000] points |\n| AI Pet Image | [usd_milli_cents=80000] points |\n| AI Promo Video | [usd_milli_cents=200000] points |"}
+APP_SETTINGS_END -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --bg:#FFF8F0;--bg2:#FFF1E6;--card:#FFFFFF;--text:#2D1B0E;--text2:#6B4C33;
+  --muted:#A68B6B;--accent:#FF6B35;--accent2:#FF9F1C;--purple:#7B2D8E;
+  --green:#2DB67D;--red:#DC2626;--blue:#2563EB;--border:#F0DCC8;
+  --shadow:rgba(45,27,14,.08);--overlay:rgba(0,0,0,.5);
+}
+.dark{
+  --bg:#1A1118;--bg2:#241820;--card:#2A1E26;--text:#F5E6D8;--text2:#C9A88E;
+  --muted:#8B6E58;--accent:#FF7F4F;--accent2:#FFB340;--purple:#C850C0;
+  --green:#3DD68C;--red:#F87171;--blue:#60A5FA;--border:#3D2A22;
+  --shadow:rgba(0,0,0,.3);--overlay:rgba(0,0,0,.7);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+.container{max-width:600px;margin:0 auto;padding:0 12px}
+
+
+/* ===== AUTH ===== */
+.auth-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.auth-screen.hidden{display:none;}
+.auth-logo{font-size:56px;margin-bottom:4px;}
+.auth-title{font-size:28px;font-weight:900;color:var(--accent);margin-bottom:2px;}
+.auth-sub{font-size:14px;color:var(--muted);margin-bottom:32px;}
+.auth-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:400px;box-shadow:0 4px 24px var(--shadow);}
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;background:var(--bg2);border-radius:12px;padding:4px;}
+.auth-tab{flex:1;padding:9px;border:none;background:none;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--muted);border-radius:10px;cursor:pointer;transition:all .2s;}
+.auth-tab.active{background:var(--card);color:var(--accent);box-shadow:0 2px 8px var(--shadow);}
+.auth-form{display:none;}
+.auth-form.active{display:block;}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:12px;font-weight:700;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-error{background:rgba(220,38,38,.1);border:1px solid var(--red);color:var(--red);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:12px;display:none;}
+.auth-error.show{display:block;}
+.auth-success{background:rgba(45,182,125,.1);border:1px solid var(--green);color:var(--green);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:12px;display:none;}
+.auth-success.show{display:block;}
+.user-chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.2);border-radius:10px;padding:4px 10px 4px 6px;cursor:pointer;transition:all .2s;}
+.user-chip:hover{background:rgba(255,255,255,.3);}
+.user-avatar{width:26px;height:26px;border-radius:8px;background:#FFF;color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;}
+.user-name{color:#FFF;font-size:13px;font-weight:700;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* Nav bar */
+.navbar{position:sticky;top:0;z-index:50;background:var(--accent);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(255,107,53,.2)}
+.nav-title{color:#FFF;font-size:20px;font-weight:900;display:flex;align-items:center;gap:8px}
+.nav-actions{display:flex;gap:8px}
+.nav-btn{background:rgba(255,255,255,.2);border:none;color:#FFF;width:36px;height:36px;border-radius:10px;font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.nav-btn:hover{background:rgba(255,255,255,.3)}
+.nav-btn.premium{background:linear-gradient(135deg,#FFD700,#FFA500);color:#2D1B0E}
+
+/* Bottom tab bar */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;z-index:50;box-shadow:0 -2px 12px var(--shadow)}
+.tab{flex:1;padding:8px 0 10px;text-align:center;cursor:pointer;transition:all .2s;border:none;background:none;font-family:'Nunito',sans-serif}
+.tab-icon{font-size:20px;color:var(--muted);display:block;margin-bottom:2px;transition:color .2s}
+.tab-label{font-size:11px;font-weight:700;color:var(--muted);transition:color .2s}
+.tab.active .tab-icon,.tab.active .tab-label{color:var(--accent)}
+
+/* Screens */
+.screen{display:none;padding:16px 0}
+.screen.active{display:block}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:0 2px 12px var(--shadow)}
+.card-title{font-size:15px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card-title i{color:var(--accent)}
+
+/* Pet cards */
+.pet-card{display:flex;align-items:center;gap:14px;padding:14px;background:var(--bg2);border-radius:14px;margin-bottom:10px;cursor:pointer;transition:all .2s;border:2px solid transparent}
+.pet-card:hover,.pet-card.selected{border-color:var(--accent);transform:translateY(-1px)}
+.pet-avatar{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.pet-info{flex:1}
+.pet-name{font-size:16px;font-weight:800}
+.pet-breed{font-size:13px;color:var(--muted);font-weight:600}
+.pet-status{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(45,182,125,.12);color:var(--green)}
+
+/* Premium badge */
+.premium-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:800;background:linear-gradient(135deg,#FFD700,#FFA500);color:#2D1B0E}
+
+/* Buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 20px;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;width:100%}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#FFF;box-shadow:0 4px 16px rgba(255,107,53,.3)}
+.btn-premium{background:linear-gradient(135deg,#FFD700,#FFA500);color:#2D1B0E;box-shadow:0 4px 16px rgba(255,215,0,.3)}
+.btn-purple{background:linear-gradient(135deg,var(--purple),#C850C0);color:#FFF;box-shadow:0 4px 16px rgba(123,45,142,.3)}
+.btn-outline{background:var(--card);border:2px solid var(--border);color:var(--text)}
+.btn-sm{padding:9px 16px;font-size:13px;width:auto}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+.btn-row .btn{flex:1}
+
+/* Form */
+.form-group{margin-bottom:14px}
+.form-label{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:5px;display:block}
+.form-input,.form-select{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-size:16px;color:var(--text);background:var(--bg2);transition:border-color .2s}
+.form-input:focus,.form-select:focus{outline:none;border-color:var(--accent)}
+.form-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A68B6B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+
+/* Events/records */
+.record{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--bg2);margin-bottom:8px}
+.record-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.record-info{flex:1}
+.record-title{font-size:14px;font-weight:700}
+.record-sub{font-size:12px;color:var(--muted);font-weight:600}
+
+/* AI Response area */
+.ai-response{background:var(--bg2);border:2px solid var(--border);border-radius:14px;padding:16px;margin-top:12px;font-size:14px;line-height:1.7;color:var(--text2);white-space:pre-wrap;max-height:400px;overflow-y:auto}
+.ai-loading{text-align:center;padding:30px;color:var(--muted)}
+.ai-loading .spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:var(--overlay);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card);border-radius:20px;padding:24px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal-title{font-size:18px;font-weight:900;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:12px;opacity:.4}
+.empty-text{font-size:15px;font-weight:700}
+
+/* Image result */
+.img-result{width:100%;border-radius:14px;margin-top:12px;display:none}
+.video-result{width:100%;border-radius:14px;margin-top:12px;display:none}
+
+/* Toast */
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--text);color:var(--bg);padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;box-shadow:0 4px 20px var(--shadow);transition:transform .3s;z-index:200}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:380px){
+  .container{padding:0 8px}
+  .card{padding:14px}
+  .btn-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+
+<!-- ===== AUTH SCREEN ===== -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-logo">🐾</div>
+  <div class="auth-title">PetVida</div>
+  <div class="auth-sub">Cuidados com seu Pet</div>
+
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Cadastrar</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="auth-form active" id="authLogin">
+      <div class="auth-error" id="loginError"></div>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-input" id="loginEmail" type="email" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input class="form-input" id="loginPass" type="password" placeholder="Sua senha" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()" style="margin-top:4px">
+        <i class="fas fa-sign-in-alt"></i> Entrar
+      </button>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px;cursor:pointer" onclick="switchAuthTab('register')">
+        Não tem conta? <strong style="color:var(--accent)">Cadastre-se</strong>
+      </p>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="auth-form" id="authRegister">
+      <div class="auth-error" id="registerError"></div>
+      <div class="auth-success" id="registerSuccess"></div>
+      <div class="form-group">
+        <label class="form-label">Nome</label>
+        <input class="form-input" id="regName" type="text" placeholder="Seu nome" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-input" id="regEmail" type="email" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input class="form-input" id="regPass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirmar Senha</label>
+        <input class="form-input" id="regPass2" type="password" placeholder="Repita a senha" autocomplete="new-password">
+      </div>
+      <button class="btn btn-primary" onclick="doRegister()" style="margin-top:4px">
+        <i class="fas fa-user-plus"></i> Criar Conta
+      </button>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px;cursor:pointer" onclick="switchAuthTab('login')">
+        Já tem conta? <strong style="color:var(--accent)">Entrar</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<div class="navbar">
+  <div class="nav-title"><i class="fas fa-paw"></i> PetVida</div>
+  <div class="nav-actions" style="display:flex;align-items:center;gap:8px">
+    <button class="nav-btn premium" title="Premium" onclick="showTab('premium')"><i class="fas fa-crown"></i></button>
+    <div class="user-chip" id="userChip" onclick="doLogout()" title="Sair">
+      <div class="user-avatar" id="userInitial">?</div>
+      <span class="user-name" id="userNameLabel">Usuário</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- HOME SCREEN -->
+  <div class="screen active" id="screen-home">
+    <div style="padding:14px 0 8px">
+      <h2 style="font-size:18px;font-weight:900">Meus Pets</h2>
+      <p style="font-size:13px;color:var(--muted)">Gerencie seus companheiros</p>
+    </div>
+    <div id="petList"></div>
+    <button class="btn btn-primary" onclick="openAddPetModal()">
+      <i class="fas fa-plus"></i> Adicionar Pet
+    </button>
+  </div>
+
+  <!-- HEALTH SCREEN -->
+  <div class="screen" id="screen-health">
+    <div style="padding:14px 0 8px">
+      <h2 style="font-size:18px;font-weight:900">Saude</h2>
+      <p style="font-size:13px;color:var(--muted)">Historico e registros medicos</p>
+    </div>
+    <div id="healthPetSelect"></div>
+    <div class="card">
+      <div class="card-title"><i class="fas fa-notes-medical"></i> Registros de Saude</div>
+      <div id="healthRecords"></div>
+      <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="openAddHealthModal()">
+        <i class="fas fa-plus"></i> Novo Registro
+      </button>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="fas fa-syringe"></i> Vacinas</div>
+      <div id="vaccineRecords"></div>
+      <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="openAddVaccineModal()">
+        <i class="fas fa-plus"></i> Nova Vacina
+      </button>
+    </div>
+    <div class="card" style="border:2px solid #FFD700">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="card-title" style="margin-bottom:0"><i class="fas fa-robot"></i> Analise IA</div>
+        <span class="premium-tag"><i class="fas fa-crown"></i> Premium</span>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">A IA analisa o historico do seu pet e da recomendacoes personalizadas de saude.</p>
+      <button class="btn btn-premium" id="aiHealthBtn" onclick="requestAIHealth()">
+        <i class="fas fa-sparkles"></i> Analisar Saude com IA
+      </button>
+      <div class="ai-response" id="aiHealthResult" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- AGENDA SCREEN -->
+  <div class="screen" id="screen-agenda">
+    <div style="padding:14px 0 8px">
+      <h2 style="font-size:18px;font-weight:900">Agenda</h2>
+      <p style="font-size:13px;color:var(--muted)">Compromissos e lembretes</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="fas fa-calendar-days"></i> Proximos Eventos</div>
+      <div id="agendaList"></div>
+      <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="openAddEventModal()">
+        <i class="fas fa-plus"></i> Novo Evento
+      </button>
+    </div>
+  </div>
+
+  <!-- PREMIUM SCREEN -->
+  <div class="screen" id="screen-premium">
+    <div style="padding:14px 0 8px;text-align:center">
+      <div style="font-size:40px;margin-bottom:8px">👑</div>
+      <h2 style="font-size:20px;font-weight:900">Recursos Premium</h2>
+      <p style="font-size:13px;color:var(--muted)">Funcionalidades com Inteligencia Artificial</p>
+    </div>
+
+    <div class="card" style="border:2px solid #FFD700">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="card-title" style="margin-bottom:0"><i class="fas fa-heartbeat"></i> Analise de Saude IA</div>
+        <span class="premium-tag"><i class="fas fa-crown"></i> Premium</span>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">IA analisa historico do pet e recomenda cuidados personalizados.</p>
+      <button class="btn btn-premium btn-sm" onclick="showTab('health')"><i class="fas fa-arrow-right"></i> Ir para Saude</button>
+    </div>
+
+    <div class="card" style="border:2px solid #FFD700">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="card-title" style="margin-bottom:0"><i class="fas fa-utensils"></i> Plano Alimentar IA</div>
+        <span class="premium-tag"><i class="fas fa-crown"></i> Premium</span>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Receba um plano de dieta personalizado para seu pet baseado na raca, idade e peso.</p>
+      <button class="btn btn-premium" id="aiDietBtn" onclick="requestAIDiet()"><i class="fas fa-sparkles"></i> Gerar Plano Alimentar</button>
+      <div class="ai-response" id="aiDietResult" style="display:none"></div>
+    </div>
+
+    <div class="card" style="border:2px solid #FFD700">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="card-title" style="margin-bottom:0"><i class="fas fa-image"></i> Imagem IA do Pet</div>
+        <span class="premium-tag"><i class="fas fa-crown"></i> Premium</span>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Gere uma imagem artistica do seu pet usando Inteligencia Artificial.</p>
+      <div class="form-group">
+        <label class="form-label">Estilo da imagem</label>
+        <select class="form-select" id="imageStyle">
+          <option value="realistic portrait">Retrato Realista</option>
+          <option value="watercolor painting">Aquarela</option>
+          <option value="cartoon pixar style">Estilo Pixar</option>
+          <option value="oil painting renaissance">Pintura a Oleo</option>
+          <option value="anime style">Estilo Anime</option>
+        </select>
+      </div>
+      <button class="btn btn-premium" id="aiImageBtn" onclick="requestAIImage()"><i class="fas fa-sparkles"></i> Gerar Imagem</button>
+      <img class="img-result" id="aiImageResult">
+      <div class="ai-response" id="aiImageStatus" style="display:none"></div>
+    </div>
+
+    <div class="card" style="border:2px solid #FFD700">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="card-title" style="margin-bottom:0"><i class="fas fa-video"></i> Video Promocional IA</div>
+        <span class="premium-tag"><i class="fas fa-crown"></i> Premium</span>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Gere um video curto com seu pet usando IA generativa.</p>
+      <button class="btn btn-premium" id="aiVideoBtn" onclick="requestAIVideo()"><i class="fas fa-sparkles"></i> Gerar Video</button>
+      <video class="video-result" id="aiVideoResult" controls playsinline></video>
+      <div class="ai-response" id="aiVideoStatus" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab active" data-tab="home"><span class="tab-icon"><i class="fas fa-house"></i></span><span class="tab-label">Inicio</span></button>
+  <button class="tab" data-tab="health"><span class="tab-icon"><i class="fas fa-heart-pulse"></i></span><span class="tab-label">Saude</span></button>
+  <button class="tab" data-tab="agenda"><span class="tab-icon"><i class="fas fa-calendar"></i></span><span class="tab-label">Agenda</span></button>
+  <button class="tab" data-tab="premium"><span class="tab-icon"><i class="fas fa-crown"></i></span><span class="tab-label">Premium</span></button>
+</div>
+
+<!-- ADD PET MODAL -->
+<div class="modal-overlay" id="addPetModal">
+  <div class="modal">
+    <div class="modal-title">Adicionar Pet</div>
+    <div class="modal-sub">Preencha os dados do seu companheiro</div>
+    <div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="petNameInput" placeholder="Ex: Rex"></div>
+    <div class="form-group"><label class="form-label">Especie</label><select class="form-select" id="petSpeciesInput"><option value="dog">Cachorro</option><option value="cat">Gato</option><option value="bird">Passaro</option><option value="other">Outro</option></select></div>
+    <div class="form-group"><label class="form-label">Raca</label><input class="form-input" id="petBreedInput" placeholder="Ex: Golden Retriever"></div>
+    <div class="form-group"><label class="form-label">Peso (kg)</label><input class="form-input" id="petWeightInput" type="number" placeholder="Ex: 9.5"></div>
+    <div class="form-group"><label class="form-label">Idade</label><input class="form-input" id="petAgeInput" placeholder="Ex: 3 anos"></div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="closeModal('addPetModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addPet()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD HEALTH RECORD MODAL -->
+<div class="modal-overlay" id="addHealthModal">
+  <div class="modal">
+    <div class="modal-title">Novo Registro de Saude</div>
+    <div class="modal-sub">Registre uma consulta, exame ou medicacao</div>
+    <div class="form-group"><label class="form-label">Tipo</label><select class="form-select" id="healthTypeInput"><option value="Consulta">Consulta</option><option value="Exame">Exame</option><option value="Medicacao">Medicacao</option><option value="Cirurgia">Cirurgia</option></select></div>
+    <div class="form-group"><label class="form-label">Descricao</label><input class="form-input" id="healthDescInput" placeholder="Ex: Consulta de rotina"></div>
+    <div class="form-group"><label class="form-label">Data</label><input class="form-input" id="healthDateInput" type="date"></div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="closeModal('addHealthModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addHealthRecord()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD VACCINE MODAL -->
+<div class="modal-overlay" id="addVaccineModal">
+  <div class="modal">
+    <div class="modal-title">Nova Vacina</div>
+    <div class="modal-sub">Registre uma vacinacao</div>
+    <div class="form-group"><label class="form-label">Vacina</label><input class="form-input" id="vaccineNameInput" placeholder="Ex: V10 Multipla"></div>
+    <div class="form-group"><label class="form-label">Data</label><input class="form-input" id="vaccineDateInput" type="date"></div>
+    <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="vaccineStatusInput"><option value="Aplicada">Aplicada</option><option value="Agendada">Agendada</option><option value="Pendente">Pendente</option></select></div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="closeModal('addVaccineModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addVaccine()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD EVENT MODAL -->
+<div class="modal-overlay" id="addEventModal">
+  <div class="modal">
+    <div class="modal-title">Novo Evento</div>
+    <div class="modal-sub">Agende um compromisso para seu pet</div>
+    <div class="form-group"><label class="form-label">Tipo</label><select class="form-select" id="eventTypeInput"><option value="Banho">Banho</option><option value="Tosa">Tosa</option><option value="Veterinario">Veterinario</option><option value="Vacina">Vacina</option><option value="Passeio">Passeio</option><option value="Outro">Outro</option></select></div>
+    <div class="form-group"><label class="form-label">Descricao</label><input class="form-input" id="eventDescInput" placeholder="Ex: Banho no petshop"></div>
+    <div class="form-group"><label class="form-label">Data</label><input class="form-input" id="eventDateInput" type="date"></div>
+    <div class="form-group"><label class="form-label">Horario</label><input class="form-input" id="eventTimeInput" type="time"></div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="closeModal('addEventModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addEvent()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal" style="text-align:center">
+    <div style="font-size:36px;margin-bottom:8px">🗑️</div>
+    <div class="modal-title" style="text-align:center" id="confirmText">Tem certeza?</div>
+    <div class="modal-sub" id="confirmSub">Esta acao nao pode ser desfeita.</div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="closeModal('confirmModal')">Cancelar</button>
+      <button class="btn btn-primary" id="confirmAction" style="background:var(--red)">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* Dark mode */
+if(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches){document.documentElement.classList.add('dark')}
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(e){e.matches?document.documentElement.classList.add('dark'):document.documentElement.classList.remove('dark')});
+
+/* ====== STATE ====== */
+var state={
+  pets:[
+    {id:1,name:'Rex',species:'dog',breed:'Golden Retriever',weight:'9.3',age:'3 anos',health:[
+      {type:'Consulta',desc:'Consulta de rotina',date:'2026-02-10'},
+      {type:'Exame',desc:'Exame de sangue',date:'2026-01-25'}
+    ],vaccines:[
+      {name:'V10 Multipla',date:'2025-12-15',status:'Aplicada'},
+      {name:'Antirrabica',date:'2026-04-20',status:'Agendada'}
+    ]},
+    {id:2,name:'Mimi',species:'cat',breed:'Gato Persa',weight:'4.2',age:'2 anos',health:[],vaccines:[]}
+  ],
+  events:[
+    {type:'Banho',desc:'Banho - Rex',date:'2026-03-08',time:'10:00'},
+    {type:'Veterinario',desc:'Veterinario - Mimi',date:'2026-03-15',time:'14:30'}
+  ],
+  selectedPet:0,
+  nextId:3
+};
+
+var speciesEmoji={dog:'🐕',cat:'🐱',bird:'🐦',other:'🐾'};
+var speciesColors={dog:'#FF6B35',cat:'#7B2D8E',bird:'#2563EB',other:'#2DB67D'};
+var typeColors={Consulta:'#7B2D8E',Exame:'#2DB67D',Medicacao:'#FF6B35',Cirurgia:'#DC2626',Banho:'#2563EB',Tosa:'#FF9F1C',Veterinario:'#7B2D8E',Vacina:'#DC2626',Passeio:'#2DB67D',Outro:'#A68B6B'};
+
+/* ====== TOAST ====== */
+var toastEl=document.getElementById('toast');
+function showToast(m){toastEl.textContent=m;toastEl.classList.add('show');setTimeout(function(){toastEl.classList.remove('show')},2400)}
+
+/* ====== TABS ====== */
+function showTab(name){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('screen-'+name).classList.add('active');
+  var tab=document.querySelector('.tab[data-tab="'+name+'"]');
+  if(tab)tab.classList.add('active');
+  if(name==='health')renderHealth();
+  if(name==='agenda')renderAgenda();
+}
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click',function(){showTab(this.getAttribute('data-tab'))});
+});
+
+/* ====== MODALS ====== */
+function openModal(id){document.getElementById(id).classList.add('active')}
+function closeModal(id){document.getElementById(id).classList.remove('active')}
+function openAddPetModal(){
+  ['petNameInput','petBreedInput','petWeightInput','petAgeInput'].forEach(function(id){document.getElementById(id).value=''});
+  openModal('addPetModal');
+}
+function openAddHealthModal(){if(state.pets.length===0){showToast('Adicione um pet primeiro');return}openModal('addHealthModal')}
+function openAddVaccineModal(){if(state.pets.length===0){showToast('Adicione um pet primeiro');return}openModal('addVaccineModal')}
+function openAddEventModal(){openModal('addEventModal')}
+
+function showConfirm(text,sub,action){
+  document.getElementById('confirmText').textContent=text;
+  document.getElementById('confirmSub').textContent=sub;
+  document.getElementById('confirmAction').onclick=function(){action();closeModal('confirmModal')};
+  openModal('confirmModal');
+}
+
+/* ====== RENDER ====== */
+function renderPets(){
+  var list=document.getElementById('petList');
+  if(state.pets.length===0){
+    list.innerHTML='<div class="empty"><div class="empty-icon">🐾</div><div class="empty-text">Nenhum pet cadastrado</div></div>';
+    return;
+  }
+  var html='';
+  state.pets.forEach(function(p,i){
+    html+='<div class="pet-card'+(i===state.selectedPet?' selected':'')+'" onclick="selectPet('+i+')">';
+    html+='<div class="pet-avatar" style="background:'+speciesColors[p.species]+'">'+speciesEmoji[p.species]+'</div>';
+    html+='<div class="pet-info"><div class="pet-name">'+esc(p.name)+'</div><div class="pet-breed">'+esc(p.breed)+' • '+esc(p.weight)+'kg • '+esc(p.age)+'</div></div>';
+    html+='<span class="pet-status">Ativo</span>';
+    html+='</div>';
+  });
+  list.innerHTML=html;
+}
+
+function renderHealth(){
+  var pet=state.pets[state.selectedPet];
+  if(!pet)return;
+  /* Pet selector */
+  var sel='';
+  state.pets.forEach(function(p,i){
+    sel+='<div class="pet-card'+(i===state.selectedPet?' selected':'')+'" onclick="selectPet('+i+');renderHealth()" style="margin-bottom:8px">';
+    sel+='<div class="pet-avatar" style="background:'+speciesColors[p.species]+';width:40px;height:40px;font-size:20px;border-radius:10px">'+speciesEmoji[p.species]+'</div>';
+    sel+='<div class="pet-info"><div class="pet-name" style="font-size:14px">'+esc(p.name)+'</div></div></div>';
+  });
+  document.getElementById('healthPetSelect').innerHTML=sel;
+
+  /* Health records */
+  var hr='';
+  if(pet.health.length===0){hr='<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">Nenhum registro ainda</div>';}
+  else{pet.health.forEach(function(h){
+    hr+='<div class="record"><div class="record-dot" style="background:'+(typeColors[h.type]||'#A68B6B')+'"></div>';
+    hr+='<div class="record-info"><div class="record-title">'+esc(h.type)+' - '+esc(h.desc)+'</div><div class="record-sub">'+esc(h.date)+'</div></div></div>';
+  });}
+  document.getElementById('healthRecords').innerHTML=hr;
+
+  /* Vaccines */
+  var vr='';
+  if(pet.vaccines.length===0){vr='<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">Nenhuma vacina registrada</div>';}
+  else{pet.vaccines.forEach(function(v){
+    var sc=v.status==='Aplicada'?'var(--green)':v.status==='Agendada'?'var(--blue)':'var(--accent)';
+    vr+='<div class="record"><div class="record-dot" style="background:'+sc+'"></div>';
+    vr+='<div class="record-info"><div class="record-title">'+esc(v.name)+'</div><div class="record-sub">'+esc(v.date)+' • '+esc(v.status)+'</div></div></div>';
+  });}
+  document.getElementById('vaccineRecords').innerHTML=vr;
+}
+
+function renderAgenda(){
+  var list=document.getElementById('agendaList');
+  if(state.events.length===0){list.innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">Nenhum evento agendado</div>';return;}
+  var html='';
+  state.events.sort(function(a,b){return a.date.localeCompare(b.date)});
+  state.events.forEach(function(e){
+    html+='<div class="record"><div class="record-dot" style="background:'+(typeColors[e.type]||'#A68B6B')+'"></div>';
+    html+='<div class="record-info"><div class="record-title">'+esc(e.desc)+'</div><div class="record-sub">'+esc(e.date)+' '+esc(e.time||'')+'</div></div></div>';
+  });
+  list.innerHTML=html;
+}
+
+/* ====== ACTIONS ====== */
+function selectPet(i){state.selectedPet=i;renderPets()}
+
+function addPet(){
+  var name=document.getElementById('petNameInput').value.trim();
+  if(!name){showToast('Digite o nome do pet');return}
+  state.pets.push({
+    id:state.nextId++,name:name,
+    species:document.getElementById('petSpeciesInput').value,
+    breed:document.getElementById('petBreedInput').value.trim()||'Sem raca definida',
+    weight:document.getElementById('petWeightInput').value||'0',
+    age:document.getElementById('petAgeInput').value.trim()||'Desconhecida',
+    health:[],vaccines:[]
+  });
+  closeModal('addPetModal');renderPets();showToast(name+' adicionado!');
+}
+
+function addHealthRecord(){
+  var pet=state.pets[state.selectedPet];if(!pet)return;
+  pet.health.unshift({
+    type:document.getElementById('healthTypeInput').value,
+    desc:document.getElementById('healthDescInput').value.trim()||'Registro',
+    date:document.getElementById('healthDateInput').value||new Date().toISOString().split('T')[0]
+  });
+  closeModal('addHealthModal');renderHealth();showToast('Registro adicionado!');
+}
+
+function addVaccine(){
+  var pet=state.pets[state.selectedPet];if(!pet)return;
+  pet.vaccines.unshift({
+    name:document.getElementById('vaccineNameInput').value.trim()||'Vacina',
+    date:document.getElementById('vaccineDateInput').value||new Date().toISOString().split('T')[0],
+    status:document.getElementById('vaccineStatusInput').value
+  });
+  closeModal('addVaccineModal');renderHealth();showToast('Vacina registrada!');
+}
+
+function addEvent(){
+  state.events.push({
+    type:document.getElementById('eventTypeInput').value,
+    desc:document.getElementById('eventDescInput').value.trim()||document.getElementById('eventTypeInput').value,
+    date:document.getElementById('eventDateInput').value||new Date().toISOString().split('T')[0],
+    time:document.getElementById('eventTimeInput').value||'00:00'
+  });
+  closeModal('addEventModal');renderAgenda();showToast('Evento agendado!');
+}
+
+function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+
+/* ====== AI PREMIUM FEATURES ====== */
+
+/* Register handlers */
+window.Poe.registerHandler("ai-health-handler",function(result){
+  var msg=result.responses[0];var el=document.getElementById('aiHealthResult');
+  if(msg.status==="error"){el.innerHTML='<span style="color:var(--red)">Erro: '+(msg.statusText||'Tente novamente')+'</span>';document.getElementById('aiHealthBtn').disabled=false;}
+  else if(msg.status==="incomplete"){el.style.display='block';el.textContent=msg.content;}
+  else if(msg.status==="complete"){el.style.display='block';el.textContent=msg.content;document.getElementById('aiHealthBtn').disabled=false;showToast('Analise completa!');}
+});
+
+window.Poe.registerHandler("ai-diet-handler",function(result){
+  var msg=result.responses[0];var el=document.getElementById('aiDietResult');
+  if(msg.status==="error"){el.innerHTML='<span style="color:var(--red)">Erro: '+(msg.statusText||'Tente novamente')+'</span>';document.getElementById('aiDietBtn').disabled=false;}
+  else if(msg.status==="incomplete"){el.style.display='block';el.textContent=msg.content;}
+  else if(msg.status==="complete"){el.style.display='block';el.textContent=msg.content;document.getElementById('aiDietBtn').disabled=false;showToast('Plano gerado!');}
+});
+
+window.Poe.registerHandler("ai-image-handler",function(result){
+  var msg=result.responses[0];var el=document.getElementById('aiImageStatus');var img=document.getElementById('aiImageResult');
+  if(msg.status==="error"){el.style.display='block';el.innerHTML='<span style="color:var(--red)">Erro: '+(msg.statusText||'Tente novamente')+'</span>';document.getElementById('aiImageBtn').disabled=false;}
+  else if(msg.status==="complete"){
+    if(msg.attachments&&msg.attachments.length>0){img.src=msg.attachments[0].url;img.style.display='block';el.style.display='none';}
+    else{el.style.display='block';el.textContent='Imagem nao gerada. Tente novamente.';}
+    document.getElementById('aiImageBtn').disabled=false;showToast('Imagem gerada!');
+  }
+});
+
+window.Poe.registerHandler("ai-video-handler",function(result){
+  var msg=result.responses[0];var el=document.getElementById('aiVideoStatus');var vid=document.getElementById('aiVideoResult');
+  if(msg.status==="error"){el.style.display='block';el.innerHTML='<span style="color:var(--red)">Erro: '+(msg.statusText||'Tente novamente')+'</span>';document.getElementById('aiVideoBtn').disabled=false;}
+  else if(msg.status==="incomplete"){el.style.display='block';el.textContent='Gerando video... Isso pode levar alguns minutos.';}
+  else if(msg.status==="complete"){
+    var va=null;
+    if(msg.attachments){for(var i=0;i<msg.attachments.length;i++){if(msg.attachments[i].mimeType&&msg.attachments[i].mimeType.indexOf('video/')===0){va=msg.attachments[i];break;}}if(!va&&msg.attachments.length>0)va=msg.attachments[0];}
+    if(va){vid.src=va.url;vid.style.display='block';el.style.display='none';vid.play().catch(function(){});}
+    else{el.style.display='block';el.textContent='Video nao gerado. Tente novamente.';}
+    document.getElementById('aiVideoBtn').disabled=false;showToast('Video gerado!');
+  }
+});
+
+/* AI Health Analysis */
+async function requestAIHealth(){
+  var pet=state.pets[state.selectedPet];
+  if(!pet){showToast('Selecione um pet primeiro');return}
+  try{
+    var r=await window.Poe.captureCost([{amountUsdMilliCents:50000,description:"AI Health Analysis"}],{logChargeOutcome:true});
+    if(!r.success){showToast('Cobranca nao autorizada');return}
+  }catch(e){showToast('Erro na cobranca');return}
+  var btn=document.getElementById('aiHealthBtn');btn.disabled=true;
+  var el=document.getElementById('aiHealthResult');
+  el.style.display='block';el.innerHTML='<div class="ai-loading"><div class="spinner"></div><br>Analisando saude...</div>';
+  var healthInfo=pet.health.map(function(h){return h.type+': '+h.desc+' ('+h.date+')'}).join(', ')||'Sem registros';
+  var vaccineInfo=pet.vaccines.map(function(v){return v.name+' - '+v.status+' ('+v.date+')'}).join(', ')||'Sem vacinas';
+  var prompt='Voce e um veterinario especialista. Analise o seguinte pet e de recomendacoes de saude detalhadas em portugues:\n\nNome: '+pet.name+'\nEspecie: '+pet.species+'\nRaca: '+pet.breed+'\nPeso: '+pet.weight+'kg\nIdade: '+pet.age+'\n\nHistorico de saude: '+healthInfo+'\nVacinas: '+vaccineInfo+'\n\nDe recomendacoes praticas sobre: proximas vacinas, alimentacao ideal, exercicios, cuidados preventivos e sinais de alerta. Responda de forma clara e organizada.';
+  try{
+    await window.Poe.sendUserMessage('@Grok-4.1-Fast-Non-Reasoning '+prompt,{handler:'ai-health-handler',stream:true,openChat:false,parameters:{}});
+  }catch(e){el.innerHTML='<span style="color:var(--red)">Erro: '+((e&&e.message)||'Tente novamente')+'</span>';btn.disabled=false;}
+}
+
+/* AI Diet Plan */
+async function requestAIDiet(){
+  var pet=state.pets[state.selectedPet];
+  if(!pet){showToast('Selecione um pet primeiro');return}
+  try{
+    var r=await window.Poe.captureCost([{amountUsdMilliCents:50000,description:"AI Diet Plan"}],{logChargeOutcome:true});
+    if(!r.success){showToast('Cobranca nao autorizada');return}
+  }catch(e){showToast('Erro na cobranca');return}
+  var btn=document.getElementById('aiDietBtn');btn.disabled=true;
+  var el=document.getElementById('aiDietResult');
+  el.style.display='block';el.innerHTML='<div class="ai-loading"><div class="spinner"></div><br>Gerando plano alimentar...</div>';
+  var prompt='Voce e um nutricionista veterinario especialista. Crie um plano alimentar completo e detalhado em portugues para o seguinte pet:\n\nNome: '+pet.name+'\nEspecie: '+pet.species+'\nRaca: '+pet.breed+'\nPeso: '+pet.weight+'kg\nIdade: '+pet.age+'\n\nInclua: quantidade diaria de racao (gramas), frequencia de refeicoes, tipos de racao recomendados, petiscos permitidos, alimentos proibidos, suplementos se necessario, e dicas de hidratacao. Organize por horario do dia (manha, tarde, noite).';
+  try{
+    await window.Poe.sendUserMessage('@Grok-4.1-Fast-Non-Reasoning '+prompt,{handler:'ai-diet-handler',stream:true,openChat:false,parameters:{}});
+  }catch(e){el.innerHTML='<span style="color:var(--red)">Erro: '+((e&&e.message)||'Tente novamente')+'</span>';btn.disabled=false;}
+}
+
+/* AI Image */
+async function requestAIImage(){
+  var pet=state.pets[state.selectedPet];
+  if(!pet){showToast('Selecione um pet primeiro');return}
+  try{
+    var r=await window.Poe.captureCost([{amountUsdMilliCents:80000,description:"AI Pet Image"}],{logChargeOutcome:true});
+    if(!r.success){showToast('Cobranca nao autorizada');return}
+  }catch(e){showToast('Erro na cobranca');return}
+  var btn=document.getElementById('aiImageBtn');btn.disabled=true;
+  var el=document.getElementById('aiImageStatus');var img=document.getElementById('aiImageResult');
+  img.style.display='none';el.style.display='block';
+  el.innerHTML='<div class="ai-loading"><div class="spinner"></div><br>Gerando imagem...</div>';
+  var style=document.getElementById('imageStyle').value;
+  var breedName=pet.species==='dog'?pet.breed+' dog':pet.species==='cat'?pet.breed+' cat':pet.breed;
+  var prompt='A beautiful '+style+' of a '+breedName+' named '+pet.name+', looking happy and healthy, warm lighting, professional quality, adorable expression';
+  try{
+    await window.Poe.sendUserMessage('@Imagen-4-Fast '+prompt,{handler:'ai-image-handler',stream:false,openChat:false,parameters:{aspect_ratio:'1:1'}});
+  }catch(e){el.innerHTML='<span style="color:var(--red)">Erro: '+((e&&e.message)||'Tente novamente')+'</span>';btn.disabled=false;}
+}
+
+/* AI Video */
+async function requestAIVideo(){
+  var pet=state.pets[state.selectedPet];
+  if(!pet){showToast('Selecione um pet primeiro');return}
+  try{
+    var r=await window.Poe.captureCost([{amountUsdMilliCents:200000,description:"AI Promo Video"}],{logChargeOutcome:true});
+    if(!r.success){showToast('Cobranca nao autorizada');return}
+  }catch(e){showToast('Erro na cobranca');return}
+  var btn=document.getElementById('aiVideoBtn');btn.disabled=true;
+  var el=document.getElementById('aiVideoStatus');var vid=document.getElementById('aiVideoResult');
+  vid.style.display='none';el.style.display='block';
+  el.innerHTML='<div class="ai-loading"><div class="spinner"></div><br>Gerando video... (pode levar alguns minutos)</div>';
+  var breedName=pet.species==='dog'?pet.breed+' dog':pet.species==='cat'?pet.breed+' cat':pet.breed;
+  var prompt='A happy '+breedName+' playing in a sunny park, cinematic slow motion, warm golden hour lighting, the pet looks joyful and healthy, professional pet commercial style, 4K quality';
+  try{
+    await window.Poe.sendUserMessage('@Sora-2 '+prompt,{handler:'ai-video-handler',stream:false,openChat:false,parameters:{size:'720x1280',duration:'4'}});
+  }catch(e){el.innerHTML='<span style="color:var(--red)">Erro: '+((e&&e.message)||'Tente novamente')+'</span>';btn.disabled=false;}
+}
+
+
+/* ===== AUTH ===== */
+function authGetUsers(){try{return JSON.parse(localStorage.getItem('pv_users')||'[]');}catch(e){return[];}}
+function authSaveUsers(u){localStorage.setItem('pv_users',JSON.stringify(u));}
+function authGetSession(){try{return JSON.parse(localStorage.getItem('pv_session')||'null');}catch(e){return null;}}
+function authSaveSession(u){localStorage.setItem('pv_session',JSON.stringify(u));}
+function authClearSession(){localStorage.removeItem('pv_session');}
+
+function switchAuthTab(tab){
+  document.querySelectorAll('.auth-tab').forEach(function(t,i){t.classList.toggle('active',i===(tab==='login'?0:1));});
+  document.getElementById('authLogin').classList.toggle('active',tab==='login');
+  document.getElementById('authRegister').classList.toggle('active',tab==='register');
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('registerError').classList.remove('show');
+  document.getElementById('registerSuccess').classList.remove('show');
+}
+
+function showAuthError(id,msg){var el=document.getElementById(id);el.textContent=msg;el.classList.add('show');}
+function hideAuthError(id){document.getElementById(id).classList.remove('show');}
+
+function doLogin(){
+  var email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  var pass=document.getElementById('loginPass').value;
+  hideAuthError('loginError');
+  if(!email||!pass){showAuthError('loginError','Preencha e-mail e senha.');return;}
+  var users=authGetUsers();
+  var user=users.find(function(u){return u.email===email&&u.pass===btoa(pass);});
+  if(!user){showAuthError('loginError','E-mail ou senha incorretos.');return;}
+  authSaveSession(user);
+  enterApp(user);
+}
+
+function doRegister(){
+  var name=document.getElementById('regName').value.trim();
+  var email=document.getElementById('regEmail').value.trim().toLowerCase();
+  var pass=document.getElementById('regPass').value;
+  var pass2=document.getElementById('regPass2').value;
+  hideAuthError('registerError');
+  document.getElementById('registerSuccess').classList.remove('show');
+  if(!name){showAuthError('registerError','Digite seu nome.');return;}
+  if(!email||!email.includes('@')){showAuthError('registerError','Digite um e-mail válido.');return;}
+  if(pass.length<6){showAuthError('registerError','A senha precisa ter no mínimo 6 caracteres.');return;}
+  if(pass!==pass2){showAuthError('registerError','As senhas não coincidem.');return;}
+  var users=authGetUsers();
+  if(users.find(function(u){return u.email===email;})){showAuthError('registerError','Este e-mail já está cadastrado.');return;}
+  var newUser={id:Date.now(),name:name,email:email,pass:btoa(pass)};
+  users.push(newUser);
+  authSaveUsers(users);
+  var s=document.getElementById('registerSuccess');
+  s.textContent='Conta criada! Fazendo login...';
+  s.classList.add('show');
+  setTimeout(function(){authSaveSession(newUser);enterApp(newUser);},1000);
+}
+
+function enterApp(user){
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('userInitial').textContent=user.name.charAt(0).toUpperCase();
+  document.getElementById('userNameLabel').textContent=user.name.split(' ')[0];
+  document.getElementById('userChip').title='Olá, '+user.name+' — clique para sair';
+}
+
+function doLogout(){
+  if(!confirm('Deseja sair da sua conta?'))return;
+  authClearSession();
+  document.getElementById('authScreen').classList.remove('hidden');
+  document.getElementById('loginEmail').value='';
+  document.getElementById('loginPass').value='';
+  hideAuthError('loginError');
+}
+
+/* Check session on load */
+(function(){
+  var session=authGetSession();
+  if(session){enterApp(session);}
+})();
+
+/* ====== INIT ====== */
+renderPets();
+</script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+      navigator.serviceWorker.register("sw.js").catch(function(){});
+    });
+  }
+</script>
+</body>
+</html>
