@@ -1,0 +1,32 @@
+{
+  "name": "PetVida - Cuidados com seu Pet",
+  "short_name": "PetVida",
+  "description": "Gerencie a saude, agenda e cuidados do seu pet com inteligencia artificial.",
+  "start_url": "/pet_vida/index.html",
+  "scope": "/pet_vida/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF8F0",
+  "theme_color": "#FF6B35",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "https://i.imgur.com/o86LuNE.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.imgur.com/o86LuNE.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.imgur.com/o86LuNE.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
