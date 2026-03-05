@@ -1,28 +1,143 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PetVida - Cuidados Inteligentes</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Fontes e Estilos -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="manifest" href="/manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#FF6B35">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="PetVida">
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js');
-        });
-      }
-    </script>
-  </head>
-  <body>
+    
+    <style>
+        body { font-family: 'Nunito', sans-serif; background-color: #FFF8F0; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .brand-orange { background-color: #FF6B35; }
+        .text-brand-orange { color: #FF6B35; }
+    </style>
+</head>
+<body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+    <!-- Bibliotecas Necessárias -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { motion, AnimatePresence } = window.Motion;
+
+        // --- CONFIGURAÇÃO GEMINI (Substitua pela sua chave se necessário) ---
+        const GEMINI_API_KEY = "SUA_CHAVE_AQUI"; 
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('home');
+            const [pets, setPets] = useState([]);
+            const [selectedPetIndex, setSelectedPetIndex] = useState(0);
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [notificationPermission, setNotificationPermission] = useState('default');
+
+            // Carregar dados ao iniciar
+            useEffect(() => {
+                const savedPets = localStorage.getItem('petvida_pets');
+                if (savedPets) setPets(JSON.parse(savedPets));
+                
+                if ('Notification' in window) {
+                    setNotificationPermission(Notification.permission);
+                }
+                
+                // Registrar Service Worker
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('sw.js');
+                }
+            }, []);
+
+            const savePets = (newPets) => {
+                setPets(newPets);
+                localStorage.setItem('petvida_pets', JSON.stringify(newPets));
+            };
+
+            const requestPermission = async () => {
+                const permission = await Notification.requestPermission();
+                setNotificationPermission(permission);
+                if (permission === 'granted') {
+                    new Notification("PetVida", { body: "Notificações ativadas!" });
+                }
+            };
+
+            const currentPet = pets[selectedPetIndex];
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen pb-20">
+                    {/* Header */}
+                    <header className="brand-orange p-4 flex justify-between items-center text-white shadow-lg sticky top-0 z-50">
+                        <h1 className="font-black text-xl flex items-center gap-2">🐾 PetVida</h1>
+                        <button onClick={requestPermission} className="p-2 bg-white/20 rounded-lg">
+                            {notificationPermission === 'granted' ? '🔔' : '🔕'}
+                        </button>
+                    </header>
+
+                    {/* Conteúdo Principal */}
+                    <main className="p-4">
+                        {activeTab === 'home' && (
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <h2 className="text-2xl font-black">Meus Pets</h2>
+                                    <button onClick={() => setIsModalOpen(true)} className="brand-orange text-white p-2 rounded-xl">+</button>
+                                </div>
+                                {pets.map((pet, i) => (
+                                    <div key={i} onClick={() => setSelectedPetIndex(i)} className={`p-4 rounded-2xl glass-card border-2 ${selectedPetIndex === i ? 'border-orange-500' : 'border-transparent'}`}>
+                                        <p className="font-bold text-lg">{pet.name}</p>
+                                        <p className="text-sm text-gray-500">{pet.breed}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {activeTab === 'health' && (
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-black">Saúde do {currentPet?.name || 'Pet'}</h2>
+                                <div className="p-6 rounded-3xl bg-indigo-600 text-white shadow-xl">
+                                    <p className="font-bold mb-2">Análise IA</p>
+                                    <p className="text-sm opacity-80 mb-4">Clique para analisar a saúde do seu pet com inteligência artificial.</p>
+                                    <button className="w-full bg-white text-indigo-600 font-bold py-2 rounded-xl">Analisar Agora</button>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* Menu Inferior */}
+                    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 flex justify-around shadow-2xl">
+                        <button onClick={() => setActiveTab('home')} className={activeTab === 'home' ? 'text-orange-500' : 'text-gray-400'}>🏠</button>
+                        <button onClick={() => setActiveTab('health')} className={activeTab === 'health' ? 'text-orange-500' : 'text-gray-400'}>🏥</button>
+                        <button onClick={() => setActiveTab('agenda')} className={activeTab === 'agenda' ? 'text-orange-500' : 'text-gray-400'}>📅</button>
+                    </nav>
+
+                    {/* Modal Adicionar Pet */}
+                    {isModalOpen && (
+                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-[100]">
+                            <div className="bg-white p-8 rounded-[30px] w-full max-w-sm">
+                                <h3 className="text-xl font-black mb-4">Novo Pet</h3>
+                                <input id="petName" className="w-full p-3 bg-gray-100 rounded-xl mb-4" placeholder="Nome do Pet" />
+                                <button onClick={() => {
+                                    const name = document.getElementById('petName').value;
+                                    savePets([...pets, { name, breed: 'SRD' }]);
+                                    setIsModalOpen(false);
+                                    if (notificationPermission === 'granted') new Notification("Sucesso!", { body: name + " foi adicionado!" });
+                                }} className="w-full brand-orange text-white font-bold py-3 rounded-xl">Salvar</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
 </html>
