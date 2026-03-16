@@ -8,1154 +8,1192 @@
 +    8   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 +    9   <title>PetVida - Cuidados Inteligentes</title>
 +   10 
-+   11   <link rel="preconnect" href="https://fonts.googleapis.com">
-+   12   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-+   13   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-+   14 
-+   15   <script src="https://cdn.tailwindcss.com"></script>
-+   16   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-+   17   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-+   18   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-+   19   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-+   20 
-+   21   <!-- Firebase SDK -->
-+   22   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-+   23   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-+   24   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-+   25 
-+   26   <style>
-+   27     body {
-+   28       font-family: 'Nunito', sans-serif;
-+   29       background: linear-gradient(135deg, #FFF8F0 0%, #FFEDD5 100%);
-+   30       min-height: 100vh;
-+   31     }
-+   32     .pet-card { transition: all 0.3s ease; }
-+   33     .pet-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-+   34     .fade-in { animation: fadeIn 0.3s ease-in; }
-+   35     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-+   36     .toast-slide { animation: slideIn 0.3s ease-out; }
-+   37     @keyframes slideIn { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
-+   38     .spinner { border: 3px solid rgba(249,115,22,0.2); border-top: 3px solid #F97316; border-radius: 50%; width: 40px; height: 40px; animation: spin 0.8s linear infinite; }
-+   39     @keyframes spin { to { transform: rotate(360deg); } }
-+   40   </style>
-+   41 </head>
-+   42 
-+   43 <body>
-+   44 <div id="root"></div>
-+   45 
-+   46 <!-- ══════════════════════════════════════════════════════════
-+   47      CONFIGURACAO DO FIREBASE
-+   48      Preencha com os dados do seu projeto Firebase.
-+   49      Se deixar vazio, o app usara localStorage como fallback.
-+   50      ══════════════════════════════════════════════════════════ -->
-+   51 <script>
-+   52   const firebaseConfig = {
-+   53     apiKey: "",
-+   54     authDomain: "",
-+   55     projectId: "",
-+   56     storageBucket: "",
-+   57     messagingSenderId: "",
-+   58     appId: ""
-+   59   };
++   11   <!-- Google Fonts -->
++   12   <link rel="preconnect" href="https://fonts.googleapis.com">
++   13   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++   14   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
++   15 
++   16   <!-- Tailwind -->
++   17   <script src="https://cdn.tailwindcss.com"></script>
++   18 
++   19   <!-- React -->
++   20   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
++   21   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
++   22   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
++   23 
++   24   <!-- Ícones -->
++   25   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
++   26 
++   27   <!-- Firebase SDK -->
++   28   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
++   29   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
++   30   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
++   31 
++   32   <style>
++   33     body {
++   34       font-family: 'Nunito', sans-serif;
++   35       background: linear-gradient(135deg, #FFF8F0 0%, #FFEDD5 100%);
++   36       min-height: 100vh;
++   37     }
++   38     .pet-card { transition: all 0.3s ease; }
++   39     .pet-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
++   40     .fade-in { animation: fadeIn 0.3s ease-in; }
++   41     @keyframes fadeIn {
++   42       from { opacity: 0; transform: translateY(10px); }
++   43       to { opacity: 1; transform: translateY(0); }
++   44     }
++   45     .toast-slide { animation: slideIn 0.3s ease-out; }
++   46     @keyframes slideIn {
++   47       from { opacity: 0; transform: translateX(100px); }
++   48       to { opacity: 1; transform: translateX(0); }
++   49     }
++   50     .spinner {
++   51       border: 3px solid rgba(249,115,22,0.2);
++   52       border-top: 3px solid #F97316;
++   53       border-radius: 50%;
++   54       width: 40px; height: 40px;
++   55       animation: spin 0.8s linear infinite;
++   56     }
++   57     @keyframes spin { to { transform: rotate(360deg); } }
++   58   </style>
++   59 </head>
 +   60 
-+   61   let fbAuth = null;
-+   62   let fbDb = null;
-+   63   let useFirebase = false;
-+   64 
-+   65   try {
-+   66     if (firebaseConfig.apiKey && firebaseConfig.apiKey.length > 5) {
-+   67       firebase.initializeApp(firebaseConfig);
-+   68       fbAuth = firebase.auth();
-+   69       fbDb = firebase.firestore();
-+   70       useFirebase = true;
-+   71       console.log("Firebase inicializado com sucesso");
-+   72     } else {
-+   73       console.log("Firebase nao configurado - usando localStorage");
-+   74     }
-+   75   } catch (e) {
-+   76     console.warn("Erro ao inicializar Firebase:", e);
-+   77   }
-+   78 </script>
-+   79 
-+   80 <script type="text/babel">
-+   81 const { useState, useEffect, useCallback } = React;
++   61 <body>
++   62 <div id="root"></div>
++   63 
++   64 <!-- ══════════════════════════════════════════════════════════════
++   65      CONFIGURAÇÃO DO FIREBASE
++   66      Preencha com os dados do seu projeto Firebase.
++   67      Se deixar vazio, o app usará localStorage como fallback.
++   68      ══════════════════════════════════════════════════════════════ -->
++   69 <script>
++   70   const firebaseConfig = {
++   71     apiKey: "",
++   72     authDomain: "",
++   73     projectId: "",
++   74     storageBucket: "",
++   75     messagingSenderId: "",
++   76     appId: ""
++   77   };
++   78 
++   79   let fbAuth = null;
++   80   let fbDb = null;
++   81   let useFirebase = false;
 +   82 
-+   83 /* ================= COMPONENTES BASE ================= */
-+   84 
-+   85 const Card = ({ children, className = "", onClick }) => (
-+   86   <div onClick={onClick} className={`bg-white rounded-2xl shadow-lg p-5 ${className}`}>
-+   87     {children}
-+   88   </div>
-+   89 );
-+   90 
-+   91 const Button = ({ children, onClick, type = "button", variant = "primary", className = "", disabled = false }) => {
-+   92   const variants = {
-+   93     primary: "bg-orange-500 hover:bg-orange-600 text-white",
-+   94     secondary: "bg-gray-200 hover:bg-gray-300 text-gray-800",
-+   95     danger: "bg-red-500 hover:bg-red-600 text-white",
-+   96     success: "bg-green-500 hover:bg-green-600 text-white",
-+   97     info: "bg-blue-500 hover:bg-blue-600 text-white"
-+   98   };
-+   99   return (
-+  100     <button type={type} onClick={onClick} disabled={disabled}
-+  101       className={`w-full py-3 px-4 rounded-xl font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${className}`}>
-+  102       {children}
-+  103     </button>
-+  104   );
-+  105 };
-+  106 
-+  107 const Input = ({ label, type = "text", name, placeholder, required = false, defaultValue = "", value, onChange, error }) => (
-+  108   <div>
-+  109     {label && <label className="block text-sm font-semibold text-gray-700 mb-1">{label}</label>}
-+  110     <input type={type} name={name} placeholder={placeholder} required={required}
-+  111       {...(value !== undefined ? { value, onChange } : { defaultValue })}
-+  112       className={`w-full p-3 border-2 ${error ? 'border-red-400 bg-red-50' : 'border-gray-200'} rounded-xl focus:border-orange-500 focus:outline-none transition-colors`}
-+  113     />
-+  114     {error && <p className="text-red-500 text-xs mt-1 font-semibold">{error}</p>}
-+  115   </div>
-+  116 );
-+  117 
-+  118 const Modal = ({ isOpen, onClose, title, children }) => {
-+  119   if (!isOpen) return null;
-+  120   return (
-+  121     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-+  122       <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto fade-in" onClick={e => e.stopPropagation()}>
-+  123         <div className="flex justify-between items-center mb-4">
-+  124           <h3 className="text-xl font-bold text-gray-800">{title}</h3>
-+  125           <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
-+  126         </div>
-+  127         {children}
-+  128       </div>
-+  129     </div>
-+  130   );
-+  131 };
-+  132 
-+  133 /* ================= TOAST NOTIFICATIONS ================= */
-+  134 
-+  135 const ToastContainer = ({ toasts }) => (
-+  136   <div className="fixed top-4 right-4 z-[70] space-y-2 max-w-xs">
-+  137     {toasts.map(toast => {
-+  138       const styles = {
-+  139         success: "bg-green-500", error: "bg-red-500",
-+  140         info: "bg-blue-500", warning: "bg-yellow-500"
-+  141       };
-+  142       const icons = {
-+  143         success: "fa-check-circle", error: "fa-times-circle",
-+  144         info: "fa-info-circle", warning: "fa-exclamation-triangle"
-+  145       };
-+  146       return (
-+  147         <div key={toast.id} className={`${styles[toast.type]} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 toast-slide font-semibold`}>
-+  148           <i className={`fas ${icons[toast.type]}`}></i>
-+  149           <span className="text-sm">{toast.message}</span>
-+  150         </div>
-+  151       );
-+  152     })}
-+  153   </div>
-+  154 );
-+  155 
-+  156 /* ================= CONFIRM DIALOG (substitui confirm()) ================= */
-+  157 
-+  158 const ConfirmDialog = ({ dialog, onClose }) => {
-+  159   if (!dialog) return null;
-+  160   return (
-+  161     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-+  162       <div className="bg-white rounded-2xl p-6 w-full max-w-sm fade-in">
-+  163         <div className="text-center mb-2">
-+  164           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-+  165             <i className="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
-+  166           </div>
-+  167           <h3 className="text-xl font-bold text-gray-800">{dialog.title}</h3>
++   83   try {
++   84     if (firebaseConfig.apiKey && firebaseConfig.apiKey.length > 5) {
++   85       firebase.initializeApp(firebaseConfig);
++   86       fbAuth = firebase.auth();
++   87       fbDb = firebase.firestore();
++   88       useFirebase = true;
++   89       console.log("✅ Firebase inicializado com sucesso");
++   90     } else {
++   91       console.log("ℹ️ Firebase não configurado — usando localStorage");
++   92     }
++   93   } catch (e) {
++   94     console.warn("❌ Erro ao inicializar Firebase:", e);
++   95   }
++   96 </script>
++   97 
++   98 <script type="text/babel">
++   99 const { useState, useEffect, useCallback } = React;
++  100 
++  101 /* ================= COMPONENTES BASE ================= */
++  102 
++  103 const Card = ({ children, className = "", onClick }) => (
++  104   <div onClick={onClick} className={`bg-white rounded-2xl shadow-lg p-5 ${className}`}>
++  105     {children}
++  106   </div>
++  107 );
++  108 
++  109 const Button = ({ children, onClick, type = "button", variant = "primary", className = "", disabled = false }) => {
++  110   const variants = {
++  111     primary: "bg-orange-500 hover:bg-orange-600 text-white",
++  112     secondary: "bg-gray-200 hover:bg-gray-300 text-gray-800",
++  113     danger: "bg-red-500 hover:bg-red-600 text-white",
++  114     success: "bg-green-500 hover:bg-green-600 text-white",
++  115     info: "bg-blue-500 hover:bg-blue-600 text-white"
++  116   };
++  117   return (
++  118     <button type={type} onClick={onClick} disabled={disabled}
++  119       className={`w-full py-3 px-4 rounded-xl font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${className}`}>
++  120       {children}
++  121     </button>
++  122   );
++  123 };
++  124 
++  125 const Input = ({ label, type = "text", name, placeholder, required = false, defaultValue = "", value, onChange, error }) => (
++  126   <div>
++  127     {label && <label className="block text-sm font-semibold text-gray-700 mb-1">{label}</label>}
++  128     <input type={type} name={name} placeholder={placeholder} required={required}
++  129       {...(value !== undefined ? { value, onChange } : { defaultValue })}
++  130       className={`w-full p-3 border-2 ${error ? 'border-red-400 bg-red-50' : 'border-gray-200'} rounded-xl focus:border-orange-500 focus:outline-none transition-colors`}
++  131     />
++  132     {error && <p className="text-red-500 text-xs mt-1 font-semibold">{error}</p>}
++  133   </div>
++  134 );
++  135 
++  136 const Modal = ({ isOpen, onClose, title, children }) => {
++  137   if (!isOpen) return null;
++  138   return (
++  139     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
++  140       <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto fade-in" onClick={e => e.stopPropagation()}>
++  141         <div className="flex justify-between items-center mb-4">
++  142           <h3 className="text-xl font-bold text-gray-800">{title}</h3>
++  143           <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
++  144         </div>
++  145         {children}
++  146       </div>
++  147     </div>
++  148   );
++  149 };
++  150 
++  151 /* ================= TOAST NOTIFICATIONS (substitui alert()) ================= */
++  152 
++  153 const ToastContainer = ({ toasts }) => (
++  154   <div className="fixed top-4 right-4 z-[70] space-y-2 max-w-xs">
++  155     {toasts.map(toast => {
++  156       const styles = {
++  157         success: "bg-green-500", error: "bg-red-500",
++  158         info: "bg-blue-500", warning: "bg-yellow-500"
++  159       };
++  160       const icons = {
++  161         success: "fa-check-circle", error: "fa-times-circle",
++  162         info: "fa-info-circle", warning: "fa-exclamation-triangle"
++  163       };
++  164       return (
++  165         <div key={toast.id} className={`${styles[toast.type]} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 toast-slide font-semibold`}>
++  166           <i className={`fas ${icons[toast.type]}`}></i>
++  167           <span className="text-sm">{toast.message}</span>
 +  168         </div>
-+  169         <p className="text-gray-600 text-center mb-6">{dialog.message}</p>
-+  170         <div className="flex gap-3">
-+  171           <button onClick={onClose}
-+  172             className="flex-1 py-3 px-4 rounded-xl font-bold bg-gray-200 hover:bg-gray-300 text-gray-800 transition-all">
-+  173             Cancelar
-+  174           </button>
-+  175           <button onClick={() => { dialog.onConfirm(); onClose(); }}
-+  176             className="flex-1 py-3 px-4 rounded-xl font-bold bg-red-500 hover:bg-red-600 text-white transition-all">
-+  177             Confirmar
-+  178           </button>
-+  179         </div>
-+  180       </div>
-+  181     </div>
-+  182   );
-+  183 };
-+  184 
-+  185 /* ================= PASSWORD STRENGTH ================= */
-+  186 
-+  187 const PasswordStrength = ({ password }) => {
-+  188   if (!password) return null;
-+  189   let strength = 0;
-+  190   if (password.length >= 6) strength++;
-+  191   if (password.length >= 8) strength++;
-+  192   if (/[A-Z]/.test(password) && /[a-z]/.test(password)) strength++;
-+  193   if (/\d/.test(password)) strength++;
-+  194   if (/[^A-Za-z0-9]/.test(password)) strength++;
-+  195 
-+  196   const levels = [
-+  197     { label: "Muito fraca", color: "bg-red-500", width: "20%" },
-+  198     { label: "Fraca", color: "bg-orange-500", width: "40%" },
-+  199     { label: "Media", color: "bg-yellow-500", width: "60%" },
-+  200     { label: "Forte", color: "bg-green-400", width: "80%" },
-+  201     { label: "Muito forte", color: "bg-green-600", width: "100%" },
-+  202   ];
-+  203   const level = levels[Math.min(strength, 4)];
++  169       );
++  170     })}
++  171   </div>
++  172 );
++  173 
++  174 /* ================= CONFIRM DIALOG (substitui confirm()) ================= */
++  175 
++  176 const ConfirmDialog = ({ dialog, onClose }) => {
++  177   if (!dialog) return null;
++  178   return (
++  179     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
++  180       <div className="bg-white rounded-2xl p-6 w-full max-w-sm fade-in">
++  181         <div className="text-center mb-2">
++  182           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
++  183             <i className="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
++  184           </div>
++  185           <h3 className="text-xl font-bold text-gray-800">{dialog.title}</h3>
++  186         </div>
++  187         <p className="text-gray-600 text-center mb-6">{dialog.message}</p>
++  188         <div className="flex gap-3">
++  189           <button onClick={onClose}
++  190             className="flex-1 py-3 px-4 rounded-xl font-bold bg-gray-200 hover:bg-gray-300 text-gray-800 transition-all">
++  191             Cancelar
++  192           </button>
++  193           <button onClick={() => { dialog.onConfirm(); onClose(); }}
++  194             className="flex-1 py-3 px-4 rounded-xl font-bold bg-red-500 hover:bg-red-600 text-white transition-all">
++  195             Confirmar
++  196           </button>
++  197         </div>
++  198       </div>
++  199     </div>
++  200   );
++  201 };
++  202 
++  203 /* ================= INDICADOR DE FORÇA DA SENHA ================= */
 +  204 
-+  205   return (
-+  206     <div className="mt-1">
-+  207       <div className="w-full bg-gray-200 rounded-full h-1.5">
-+  208         <div className={`${level.color} h-1.5 rounded-full transition-all duration-300`} style={{ width: level.width }}></div>
-+  209       </div>
-+  210       <p className={`text-xs mt-1 font-semibold ${strength < 2 ? 'text-red-500' : strength < 4 ? 'text-yellow-600' : 'text-green-600'}`}>
-+  211         {level.label}
-+  212       </p>
-+  213     </div>
-+  214   );
-+  215 };
-+  216 
-+  217 /* ================= APP PRINCIPAL ================= */
-+  218 
-+  219 function App() {
-+  220   /* ===== TODOS OS HOOKS NO TOPO (Bug #1 corrigido) ===== */
-+  221   const [isLogin, setIsLogin] = useState(true);
-+  222   const [user, setUser] = useState(null);
-+  223   const [authLoading, setAuthLoading] = useState(useFirebase);
-+  224   const [authError, setAuthError] = useState("");
-+  225   const [registerPassword, setRegisterPassword] = useState("");
-+  226 
-+  227   const [pets, setPets] = useState([]);
-+  228   const [events, setEvents] = useState([]);
-+  229   const [selectedPetId, setSelectedPetId] = useState(null);
-+  230   const [notifiedEvents, setNotifiedEvents] = useState([]);
-+  231   const [activeTab, setActiveTab] = useState('pets');
-+  232 
-+  233   // Modais de Adicionar
-+  234   const [showAddPet, setShowAddPet] = useState(false);
-+  235   const [showAddEvent, setShowAddEvent] = useState(false);
-+  236   const [showAddHealth, setShowAddHealth] = useState(false);
-+  237 
-+  238   // Modais de Editar (novo!)
-+  239   const [editingPet, setEditingPet] = useState(null);
-+  240   const [editingEvent, setEditingEvent] = useState(null);
-+  241 
-+  242   // Toast & Confirm (substituem alert/confirm)
-+  243   const [toasts, setToasts] = useState([]);
-+  244   const [confirmDialog, setConfirmDialog] = useState(null);
-+  245 
-+  246   /* ===== HELPERS ===== */
-+  247   const showToast = useCallback((message, type = "success") => {
-+  248     const id = Date.now() + Math.random();
-+  249     setToasts(prev => [...prev, { id, message, type }]);
-+  250     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
-+  251   }, []);
-+  252 
-+  253   const showConfirm = useCallback((title, message, onConfirm) => {
-+  254     setConfirmDialog({ title, message, onConfirm });
-+  255   }, []);
-+  256 
-+  257   const currentPet = pets.find(p => p.id === selectedPetId);
-+  258 
-+  259   /* ===== FIREBASE AUTH LISTENER ===== */
-+  260   useEffect(() => {
-+  261     if (!useFirebase) {
-+  262       try {
-+  263         const saved = localStorage.getItem("petvida_user");
-+  264         if (saved) setUser(JSON.parse(saved));
-+  265       } catch(e) {}
-+  266       setAuthLoading(false);
-+  267       return;
-+  268     }
-+  269 
-+  270     const unsubscribe = fbAuth.onAuthStateChanged(firebaseUser => {
-+  271       if (firebaseUser) {
-+  272         setUser({
-+  273           uid: firebaseUser.uid,
-+  274           name: firebaseUser.displayName || "Usuario",
-+  275           email: firebaseUser.email
-+  276         });
-+  277       } else {
-+  278         setUser(null);
-+  279       }
-+  280       setAuthLoading(false);
-+  281     });
-+  282     return () => unsubscribe();
-+  283   }, []);
-+  284 
-+  285   /* ===== DATA PERSISTENCE ===== */
-+  286   useEffect(() => {
-+  287     if (!user) return;
-+  288 
-+  289     if (useFirebase) {
-+  290       const uid = user.uid;
-+  291 
-+  292       const unsubPets = fbDb.collection("users").doc(uid).collection("pets")
-+  293         .orderBy("createdAt", "desc")
-+  294         .onSnapshot(snapshot => {
-+  295           setPets(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-+  296         }, err => {
-+  297           console.error("Erro pets:", err);
-+  298           showToast("Erro ao carregar pets", "error");
-+  299         });
-+  300 
-+  301       const unsubEvents = fbDb.collection("users").doc(uid).collection("events")
-+  302         .orderBy("date", "asc")
-+  303         .onSnapshot(snapshot => {
-+  304           setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-+  305         }, err => {
-+  306           console.error("Erro eventos:", err);
-+  307           showToast("Erro ao carregar eventos", "error");
-+  308         });
++  205 const PasswordStrength = ({ password }) => {
++  206   if (!password) return null;
++  207   let strength = 0;
++  208   if (password.length >= 6) strength++;
++  209   if (password.length >= 8) strength++;
++  210   if (/[A-Z]/.test(password) && /[a-z]/.test(password)) strength++;
++  211   if (/\d/.test(password)) strength++;
++  212   if (/[^A-Za-z0-9]/.test(password)) strength++;
++  213 
++  214   const levels = [
++  215     { label: "Muito fraca", color: "bg-red-500", width: "20%" },
++  216     { label: "Fraca", color: "bg-orange-500", width: "40%" },
++  217     { label: "Média", color: "bg-yellow-500", width: "60%" },
++  218     { label: "Forte", color: "bg-green-400", width: "80%" },
++  219     { label: "Muito forte", color: "bg-green-600", width: "100%" },
++  220   ];
++  221   const level = levels[Math.min(strength, 4)];
++  222 
++  223   return (
++  224     <div className="mt-1">
++  225       <div className="w-full bg-gray-200 rounded-full h-1.5">
++  226         <div className={`${level.color} h-1.5 rounded-full transition-all duration-300`} style={{ width: level.width }}></div>
++  227       </div>
++  228       <p className={`text-xs mt-1 font-semibold ${strength < 2 ? 'text-red-500' : strength < 4 ? 'text-yellow-600' : 'text-green-600'}`}>
++  229         {level.label}
++  230       </p>
++  231     </div>
++  232   );
++  233 };
++  234 
++  235 /* ================= APP PRINCIPAL ================= */
++  236 
++  237 function App() {
++  238   /* ===== TODOS OS HOOKS NO TOPO — Bug #1 corrigido ===== */
++  239   const [isLogin, setIsLogin] = useState(true);
++  240   const [user, setUser] = useState(null);
++  241   const [authLoading, setAuthLoading] = useState(useFirebase);
++  242   const [authError, setAuthError] = useState("");
++  243   const [registerPassword, setRegisterPassword] = useState("");
++  244 
++  245   const [pets, setPets] = useState([]);
++  246   const [events, setEvents] = useState([]);
++  247   const [selectedPetId, setSelectedPetId] = useState(null);
++  248   const [notifiedEvents, setNotifiedEvents] = useState([]);
++  249   const [activeTab, setActiveTab] = useState('pets');
++  250 
++  251   // Modais — Adicionar
++  252   const [showAddPet, setShowAddPet] = useState(false);
++  253   const [showAddEvent, setShowAddEvent] = useState(false);
++  254   const [showAddHealth, setShowAddHealth] = useState(false);
++  255 
++  256   // Modais — Editar (funcionalidade nova!)
++  257   const [editingPet, setEditingPet] = useState(null);
++  258   const [editingEvent, setEditingEvent] = useState(null);
++  259 
++  260   // Toast & Confirm (substituem alert/confirm nativos)
++  261   const [toasts, setToasts] = useState([]);
++  262   const [confirmDialog, setConfirmDialog] = useState(null);
++  263 
++  264   /* ===== HELPERS ===== */
++  265   const showToast = useCallback((message, type = "success") => {
++  266     const id = Date.now() + Math.random();
++  267     setToasts(prev => [...prev, { id, message, type }]);
++  268     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
++  269   }, []);
++  270 
++  271   const showConfirm = useCallback((title, message, onConfirm) => {
++  272     setConfirmDialog({ title, message, onConfirm });
++  273   }, []);
++  274 
++  275   const currentPet = pets.find(p => p.id === selectedPetId);
++  276 
++  277   /* ===== FIREBASE AUTH LISTENER ===== */
++  278   useEffect(() => {
++  279     if (!useFirebase) {
++  280       try {
++  281         const saved = localStorage.getItem("petvida_user");
++  282         if (saved) setUser(JSON.parse(saved));
++  283       } catch(e) {}
++  284       setAuthLoading(false);
++  285       return;
++  286     }
++  287 
++  288     const unsubscribe = fbAuth.onAuthStateChanged(firebaseUser => {
++  289       if (firebaseUser) {
++  290         setUser({
++  291           uid: firebaseUser.uid,
++  292           name: firebaseUser.displayName || "Usuário",
++  293           email: firebaseUser.email
++  294         });
++  295       } else {
++  296         setUser(null);
++  297       }
++  298       setAuthLoading(false);
++  299     });
++  300     return () => unsubscribe();
++  301   }, []);
++  302 
++  303   /* ===== PERSISTÊNCIA DE DADOS ===== */
++  304   useEffect(() => {
++  305     if (!user) return;
++  306 
++  307     if (useFirebase) {
++  308       const uid = user.uid;
 +  309 
-+  310       return () => { unsubPets(); unsubEvents(); };
-+  311     } else {
-+  312       try {
-+  313         const savedPets = localStorage.getItem("petvida_pets");
-+  314         const savedEvents = localStorage.getItem("petvida_events");
-+  315         const savedNotified = localStorage.getItem("petvida_notified");
-+  316         if (savedPets) setPets(JSON.parse(savedPets));
-+  317         if (savedEvents) setEvents(JSON.parse(savedEvents));
-+  318         if (savedNotified) setNotifiedEvents(JSON.parse(savedNotified));
-+  319       } catch(e) {}
-+  320     }
-+  321   }, [user]);
-+  322 
-+  323   // localStorage save (somente sem Firebase)
-+  324   useEffect(() => {
-+  325     if (useFirebase || !user) return;
-+  326     try {
-+  327       localStorage.setItem("petvida_user", JSON.stringify(user));
-+  328       localStorage.setItem("petvida_pets", JSON.stringify(pets));
-+  329       localStorage.setItem("petvida_events", JSON.stringify(events));
-+  330       localStorage.setItem("petvida_notified", JSON.stringify(notifiedEvents));
-+  331     } catch(e) {}
-+  332   }, [user, pets, events, notifiedEvents]);
-+  333 
-+  334   /* ===== NOTIFICATIONS ===== */
-+  335   useEffect(() => {
-+  336     if (!("Notification" in window)) return;
-+  337     const check = () => {
-+  338       const today = new Date().toISOString().split("T")[0];
-+  339       const currentTime = new Date().toTimeString().slice(0, 5);
-+  340       events.forEach(event => {
-+  341         if (event.date === today && event.time === currentTime &&
-+  342             Notification.permission === "granted" && !notifiedEvents.includes(event.id)) {
-+  343           new Notification("Lembrete PetVida", { body: `${event.description} as ${event.time}` });
-+  344           setNotifiedEvents(prev => [...prev, event.id]);
-+  345         }
-+  346       });
-+  347     };
-+  348     const interval = setInterval(check, 30000);
-+  349     check();
-+  350     return () => clearInterval(interval);
-+  351   }, [events, notifiedEvents]);
-+  352 
-+  353   /* ===== AUTH HANDLERS ===== */
-+  354   const handleRegister = async (e) => {
-+  355     e.preventDefault();
-+  356     setAuthError("");
-+  357     const form = new FormData(e.target);
-+  358     const name = form.get("name");
-+  359     const email = form.get("email");
-+  360     const password = form.get("password");
-+  361 
-+  362     if (password.length < 6) {
-+  363       setAuthError("A senha deve ter pelo menos 6 caracteres");
-+  364       return;
-+  365     }
-+  366 
-+  367     if (useFirebase) {
-+  368       try {
-+  369         const cred = await fbAuth.createUserWithEmailAndPassword(email, password);
-+  370         await cred.user.updateProfile({ displayName: name });
-+  371         await fbDb.collection("users").doc(cred.user.uid).set({
-+  372           name, email, createdAt: new Date().toISOString()
-+  373         });
-+  374         setUser({ uid: cred.user.uid, name, email });
-+  375         showToast("Conta criada com sucesso!", "success");
-+  376         setShowAddPet(true);
-+  377       } catch (err) {
-+  378         const msgs = {
-+  379           "auth/email-already-in-use": "Este e-mail ja esta cadastrado",
-+  380           "auth/invalid-email": "E-mail invalido",
-+  381           "auth/weak-password": "A senha deve ter pelo menos 6 caracteres"
-+  382         };
-+  383         setAuthError(msgs[err.code] || `Erro: ${err.message}`);
-+  384       }
-+  385     } else {
-+  386       const newUser = { id: Date.now().toString(), uid: Date.now().toString(), name, email, password };
-+  387       setUser(newUser);
-+  388       showToast("Conta criada com sucesso!", "success");
-+  389       setShowAddPet(true);
-+  390     }
-+  391     setRegisterPassword("");
-+  392   };
-+  393 
-+  394   const handleLogin = async (e) => {
-+  395     e.preventDefault();
-+  396     setAuthError("");
-+  397     const form = new FormData(e.target);
-+  398     const email = form.get("email");
-+  399     const password = form.get("password");
-+  400 
-+  401     if (useFirebase) {
-+  402       try {
-+  403         await fbAuth.signInWithEmailAndPassword(email, password);
-+  404         showToast("Bem-vindo de volta!", "success");
-+  405       } catch (err) {
-+  406         const msgs = {
-+  407           "auth/user-not-found": "Usuario nao encontrado",
-+  408           "auth/wrong-password": "Senha incorreta",
-+  409           "auth/invalid-email": "E-mail invalido",
-+  410           "auth/invalid-credential": "E-mail ou senha incorretos",
-+  411           "auth/too-many-requests": "Muitas tentativas. Tente mais tarde"
-+  412         };
-+  413         setAuthError(msgs[err.code] || `Erro: ${err.message}`);
-+  414       }
-+  415     } else {
-+  416       try {
-+  417         const saved = JSON.parse(localStorage.getItem("petvida_user"));
-+  418         if (saved && saved.email === email && saved.password === password) {
-+  419           setUser(saved);
-+  420           showToast("Bem-vindo de volta!", "success");
-+  421         } else {
-+  422           setAuthError("E-mail ou senha incorretos");
-+  423         }
-+  424       } catch(e) {
-+  425         setAuthError("Erro ao fazer login");
-+  426       }
-+  427     }
-+  428   };
-+  429 
-+  430   const logout = () => {
-+  431     showConfirm("Sair", "Deseja realmente sair da sua conta?", async () => {
-+  432       if (useFirebase) await fbAuth.signOut();
-+  433       setUser(null);
-+  434       setSelectedPetId(null);
-+  435       setPets([]);
-+  436       setEvents([]);
-+  437       showToast("Ate logo!", "info");
-+  438     });
-+  439   };
-+  440 
-+  441   const enableNotifications = async () => {
-+  442     if ("Notification" in window) {
-+  443       const permission = await Notification.requestPermission();
-+  444       if (permission === "granted") {
-+  445         showToast("Notificacoes ativadas!", "success");
-+  446       } else {
-+  447         showToast("Notificacoes bloqueadas pelo navegador", "warning");
++  310       const unsubPets = fbDb.collection("users").doc(uid).collection("pets")
++  311         .orderBy("createdAt", "desc")
++  312         .onSnapshot(snapshot => {
++  313           setPets(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
++  314         }, err => {
++  315           console.error("Erro ao carregar pets:", err);
++  316           showToast("Erro ao carregar pets", "error");
++  317         });
++  318 
++  319       const unsubEvents = fbDb.collection("users").doc(uid).collection("events")
++  320         .orderBy("date", "asc")
++  321         .onSnapshot(snapshot => {
++  322           setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
++  323         }, err => {
++  324           console.error("Erro ao carregar eventos:", err);
++  325           showToast("Erro ao carregar eventos", "error");
++  326         });
++  327 
++  328       return () => { unsubPets(); unsubEvents(); };
++  329     } else {
++  330       try {
++  331         const savedPets = localStorage.getItem("petvida_pets");
++  332         const savedEvents = localStorage.getItem("petvida_events");
++  333         const savedNotified = localStorage.getItem("petvida_notified");
++  334         if (savedPets) setPets(JSON.parse(savedPets));
++  335         if (savedEvents) setEvents(JSON.parse(savedEvents));
++  336         if (savedNotified) setNotifiedEvents(JSON.parse(savedNotified));
++  337       } catch(e) {}
++  338     }
++  339   }, [user]);
++  340 
++  341   // Salvar no localStorage (somente quando NÃO usa Firebase)
++  342   useEffect(() => {
++  343     if (useFirebase || !user) return;
++  344     try {
++  345       localStorage.setItem("petvida_user", JSON.stringify(user));
++  346       localStorage.setItem("petvida_pets", JSON.stringify(pets));
++  347       localStorage.setItem("petvida_events", JSON.stringify(events));
++  348       localStorage.setItem("petvida_notified", JSON.stringify(notifiedEvents));
++  349     } catch(e) {}
++  350   }, [user, pets, events, notifiedEvents]);
++  351 
++  352   /* ===== NOTIFICAÇÕES ===== */
++  353   useEffect(() => {
++  354     if (!("Notification" in window)) return;
++  355     const check = () => {
++  356       const today = new Date().toISOString().split("T")[0];
++  357       const currentTime = new Date().toTimeString().slice(0, 5);
++  358       events.forEach(event => {
++  359         if (event.date === today && event.time === currentTime &&
++  360             Notification.permission === "granted" && !notifiedEvents.includes(event.id)) {
++  361           new Notification("🐾 Lembrete PetVida", {
++  362             body: `${event.description} às ${event.time}`,
++  363             icon: "/icon-192.png"
++  364           });
++  365           setNotifiedEvents(prev => [...prev, event.id]);
++  366         }
++  367       });
++  368     };
++  369     const interval = setInterval(check, 30000);
++  370     check();
++  371     return () => clearInterval(interval);
++  372   }, [events, notifiedEvents]);
++  373 
++  374   /* ===== AUTENTICAÇÃO ===== */
++  375   const handleRegister = async (e) => {
++  376     e.preventDefault();
++  377     setAuthError("");
++  378     const form = new FormData(e.target);
++  379     const name = form.get("name");
++  380     const email = form.get("email");
++  381     const password = form.get("password");
++  382 
++  383     // Validação de senha (#3)
++  384     if (password.length < 6) {
++  385       setAuthError("A senha deve ter pelo menos 6 caracteres");
++  386       return;
++  387     }
++  388 
++  389     if (useFirebase) {
++  390       try {
++  391         const cred = await fbAuth.createUserWithEmailAndPassword(email, password);
++  392         await cred.user.updateProfile({ displayName: name });
++  393         await fbDb.collection("users").doc(cred.user.uid).set({
++  394           name, email, createdAt: new Date().toISOString()
++  395         });
++  396         setUser({ uid: cred.user.uid, name, email });
++  397         showToast("Conta criada com sucesso! 🎉", "success");
++  398         setShowAddPet(true);
++  399       } catch (err) {
++  400         const msgs = {
++  401           "auth/email-already-in-use": "Este e-mail já está cadastrado",
++  402           "auth/invalid-email": "E-mail inválido",
++  403           "auth/weak-password": "A senha deve ter pelo menos 6 caracteres"
++  404         };
++  405         setAuthError(msgs[err.code] || `Erro: ${err.message}`);
++  406       }
++  407     } else {
++  408       const newUser = { id: Date.now().toString(), uid: Date.now().toString(), name, email, password };
++  409       setUser(newUser);
++  410       showToast("Conta criada com sucesso! 🎉", "success");
++  411       setShowAddPet(true);
++  412     }
++  413     setRegisterPassword("");
++  414   };
++  415 
++  416   const handleLogin = async (e) => {
++  417     e.preventDefault();
++  418     setAuthError("");
++  419     const form = new FormData(e.target);
++  420     const email = form.get("email");
++  421     const password = form.get("password");
++  422 
++  423     if (useFirebase) {
++  424       try {
++  425         await fbAuth.signInWithEmailAndPassword(email, password);
++  426         showToast("Bem-vindo de volta! 🐾", "success");
++  427       } catch (err) {
++  428         const msgs = {
++  429           "auth/user-not-found": "Usuário não encontrado",
++  430           "auth/wrong-password": "Senha incorreta",
++  431           "auth/invalid-email": "E-mail inválido",
++  432           "auth/invalid-credential": "E-mail ou senha incorretos",
++  433           "auth/too-many-requests": "Muitas tentativas. Tente novamente mais tarde"
++  434         };
++  435         setAuthError(msgs[err.code] || `Erro: ${err.message}`);
++  436       }
++  437     } else {
++  438       try {
++  439         const saved = JSON.parse(localStorage.getItem("petvida_user"));
++  440         if (saved && saved.email === email && saved.password === password) {
++  441           setUser(saved);
++  442           showToast("Bem-vindo de volta! 🐾", "success");
++  443         } else {
++  444           setAuthError("E-mail ou senha incorretos!");
++  445         }
++  446       } catch(e) {
++  447         setAuthError("Erro ao fazer login");
 +  448       }
-+  449     } else {
-+  450       showToast("Seu navegador nao suporta notificacoes", "warning");
-+  451     }
-+  452   };
-+  453 
-+  454   /* ===== PET CRUD ===== */
-+  455   const addPet = async (e) => {
-+  456     e.preventDefault();
-+  457     const form = new FormData(e.target);
-+  458     const petData = {
-+  459       name: form.get("name"),
-+  460       species: form.get("species"),
-+  461       breed: form.get("breed") || "",
-+  462       age: form.get("age") || "",
-+  463       weight: form.get("weight") || "",
-+  464       healthRecords: [],
-+  465       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Date.now()}`,
-+  466       createdAt: new Date().toISOString()
-+  467     };
-+  468 
-+  469     if (useFirebase) {
-+  470       try {
-+  471         const ref = await fbDb.collection("users").doc(user.uid).collection("pets").add(petData);
-+  472         setSelectedPetId(ref.id);
-+  473         showToast(`${petData.name} adicionado!`, "success");
-+  474       } catch(err) {
-+  475         showToast("Erro ao adicionar pet", "error");
-+  476         return;
-+  477       }
-+  478     } else {
-+  479       const newPet = { ...petData, id: Date.now().toString() };
-+  480       setPets(prev => [...prev, newPet]);
-+  481       setSelectedPetId(newPet.id);
-+  482       showToast(`${petData.name} adicionado!`, "success");
-+  483     }
-+  484     setShowAddPet(false);
-+  485     e.target.reset();
-+  486   };
-+  487 
-+  488   const updatePet = async (e) => {
-+  489     e.preventDefault();
-+  490     const form = new FormData(e.target);
-+  491     const updates = {
-+  492       name: form.get("name"),
-+  493       species: form.get("species"),
-+  494       breed: form.get("breed") || "",
-+  495       age: form.get("age") || "",
-+  496       weight: form.get("weight") || ""
-+  497     };
-+  498 
-+  499     if (useFirebase) {
-+  500       try {
-+  501         await fbDb.collection("users").doc(user.uid).collection("pets").doc(editingPet.id).update(updates);
-+  502         showToast(`${updates.name} atualizado!`, "success");
-+  503       } catch(err) {
-+  504         showToast("Erro ao atualizar pet", "error");
-+  505         return;
-+  506       }
-+  507     } else {
-+  508       setPets(prev => prev.map(p => p.id === editingPet.id ? { ...p, ...updates } : p));
-+  509       showToast(`${updates.name} atualizado!`, "success");
-+  510     }
-+  511     setEditingPet(null);
-+  512   };
-+  513 
-+  514   const deletePet = (pet) => {
-+  515     showConfirm("Excluir Pet", `Tem certeza que deseja excluir ${pet.name}? Todos os registros serao apagados.`, async () => {
-+  516       if (useFirebase) {
-+  517         try {
-+  518           const evSnap = await fbDb.collection("users").doc(user.uid)
-+  519             .collection("events").where("petId", "==", pet.id).get();
-+  520           const batch = fbDb.batch();
-+  521           evSnap.docs.forEach(doc => batch.delete(doc.ref));
-+  522           batch.delete(fbDb.collection("users").doc(user.uid).collection("pets").doc(pet.id));
-+  523           await batch.commit();
-+  524           showToast(`${pet.name} removido`, "info");
-+  525         } catch(err) {
-+  526           showToast("Erro ao excluir pet", "error");
-+  527           return;
-+  528         }
-+  529       } else {
-+  530         setPets(prev => prev.filter(p => p.id !== pet.id));
-+  531         setEvents(prev => prev.filter(ev => ev.petId !== pet.id));
-+  532         showToast(`${pet.name} removido`, "info");
-+  533       }
-+  534       if (selectedPetId === pet.id) setSelectedPetId(null);
-+  535     });
-+  536   };
-+  537 
-+  538   /* ===== HEALTH RECORDS ===== */
-+  539   const addHealthRecord = async (e) => {
-+  540     e.preventDefault();
-+  541     const form = new FormData(e.target);
-+  542     const newRecord = {
-+  543       id: Date.now().toString(),
-+  544       description: form.get("description"),
-+  545       date: new Date().toLocaleDateString('pt-BR'),
-+  546       type: form.get("type")
-+  547     };
-+  548 
-+  549     if (useFirebase) {
-+  550       try {
-+  551         await fbDb.collection("users").doc(user.uid).collection("pets").doc(selectedPetId)
-+  552           .update({ healthRecords: firebase.firestore.FieldValue.arrayUnion(newRecord) });
-+  553         showToast("Registro de saude adicionado!", "success");
-+  554       } catch(err) {
-+  555         showToast("Erro ao registrar saude", "error");
-+  556         return;
-+  557       }
-+  558     } else {
-+  559       setPets(prev => prev.map(pet =>
-+  560         pet.id === selectedPetId
-+  561           ? { ...pet, healthRecords: [...pet.healthRecords, newRecord] }
-+  562           : pet
-+  563       ));
-+  564       showToast("Registro de saude adicionado!", "success");
-+  565     }
-+  566     setShowAddHealth(false);
-+  567     e.target.reset();
-+  568   };
-+  569 
-+  570   const deleteHealthRecord = (record) => {
-+  571     showConfirm("Excluir Registro", "Deseja excluir este registro de saude?", async () => {
-+  572       if (useFirebase) {
-+  573         try {
-+  574           const petRef = fbDb.collection("users").doc(user.uid).collection("pets").doc(selectedPetId);
-+  575           const petDoc = await petRef.get();
-+  576           const updated = petDoc.data().healthRecords.filter(r => r.id !== record.id);
-+  577           await petRef.update({ healthRecords: updated });
-+  578           showToast("Registro removido", "info");
-+  579         } catch(err) {
-+  580           showToast("Erro ao excluir registro", "error");
-+  581         }
-+  582       } else {
-+  583         setPets(prev => prev.map(pet =>
-+  584           pet.id === selectedPetId
-+  585             ? { ...pet, healthRecords: pet.healthRecords.filter(r => r.id !== record.id) }
-+  586             : pet
-+  587         ));
-+  588         showToast("Registro removido", "info");
-+  589       }
-+  590     });
-+  591   };
-+  592 
-+  593   /* ===== EVENTS CRUD ===== */
-+  594   const addEvent = async (e) => {
-+  595     e.preventDefault();
-+  596     const form = new FormData(e.target);
-+  597     const eventData = {
-+  598       petId: selectedPetId,
-+  599       description: form.get("description"),
-+  600       date: form.get("date"),
-+  601       time: form.get("time"),
-+  602       type: form.get("type"),
-+  603       completed: false,
-+  604       createdAt: new Date().toISOString()
-+  605     };
-+  606 
-+  607     if (useFirebase) {
-+  608       try {
-+  609         await fbDb.collection("users").doc(user.uid).collection("events").add(eventData);
-+  610         showToast("Evento agendado!", "success");
-+  611       } catch(err) {
-+  612         showToast("Erro ao agendar evento", "error");
-+  613         return;
-+  614       }
-+  615     } else {
-+  616       setEvents(prev => [...prev, { ...eventData, id: Date.now().toString() }]);
-+  617       showToast("Evento agendado!", "success");
-+  618     }
-+  619     setShowAddEvent(false);
-+  620     e.target.reset();
-+  621   };
-+  622 
-+  623   const updateEvent = async (e) => {
-+  624     e.preventDefault();
-+  625     const form = new FormData(e.target);
-+  626     const updates = {
-+  627       description: form.get("description"),
-+  628       date: form.get("date"),
-+  629       time: form.get("time"),
-+  630       type: form.get("type")
++  449     }
++  450   };
++  451 
++  452   const logout = () => {
++  453     showConfirm("Sair", "Deseja realmente sair da sua conta?", async () => {
++  454       if (useFirebase) await fbAuth.signOut();
++  455       setUser(null);
++  456       setSelectedPetId(null);
++  457       setPets([]);
++  458       setEvents([]);
++  459       showToast("Até logo! 👋", "info");
++  460     });
++  461   };
++  462 
++  463   const enableNotifications = async () => {
++  464     if ("Notification" in window) {
++  465       const permission = await Notification.requestPermission();
++  466       if (permission === "granted") {
++  467         showToast("Notificações ativadas! 🔔", "success");
++  468       } else {
++  469         showToast("Notificações bloqueadas pelo navegador", "warning");
++  470       }
++  471     } else {
++  472       showToast("Seu navegador não suporta notificações", "warning");
++  473     }
++  474   };
++  475 
++  476   /* ===== PET — CRUD ===== */
++  477   const addPet = async (e) => {
++  478     e.preventDefault();
++  479     const form = new FormData(e.target);
++  480     const petData = {
++  481       name: form.get("name"),
++  482       species: form.get("species"),
++  483       breed: form.get("breed") || "",
++  484       age: form.get("age") || "",
++  485       weight: form.get("weight") || "",
++  486       healthRecords: [],
++  487       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Date.now()}`,
++  488       createdAt: new Date().toISOString()
++  489     };
++  490 
++  491     if (useFirebase) {
++  492       try {
++  493         const ref = await fbDb.collection("users").doc(user.uid).collection("pets").add(petData);
++  494         setSelectedPetId(ref.id);
++  495         showToast(`${petData.name} adicionado! 🐾`, "success");
++  496       } catch(err) {
++  497         showToast("Erro ao adicionar pet", "error");
++  498         return;
++  499       }
++  500     } else {
++  501       const newPet = { ...petData, id: Date.now().toString() };
++  502       setPets(prev => [...prev, newPet]);
++  503       setSelectedPetId(newPet.id);
++  504       showToast(`${petData.name} adicionado! 🐾`, "success");
++  505     }
++  506     setShowAddPet(false);
++  507     e.target.reset();
++  508   };
++  509 
++  510   const updatePet = async (e) => {
++  511     e.preventDefault();
++  512     const form = new FormData(e.target);
++  513     const updates = {
++  514       name: form.get("name"),
++  515       species: form.get("species"),
++  516       breed: form.get("breed") || "",
++  517       age: form.get("age") || "",
++  518       weight: form.get("weight") || ""
++  519     };
++  520 
++  521     if (useFirebase) {
++  522       try {
++  523         await fbDb.collection("users").doc(user.uid).collection("pets").doc(editingPet.id).update(updates);
++  524         showToast(`${updates.name} atualizado! ✏️`, "success");
++  525       } catch(err) {
++  526         showToast("Erro ao atualizar pet", "error");
++  527         return;
++  528       }
++  529     } else {
++  530       setPets(prev => prev.map(p => p.id === editingPet.id ? { ...p, ...updates } : p));
++  531       showToast(`${updates.name} atualizado! ✏️`, "success");
++  532     }
++  533     setEditingPet(null);
++  534   };
++  535 
++  536   const deletePet = (pet) => {
++  537     showConfirm(
++  538       "Excluir Pet",
++  539       `Tem certeza que deseja excluir ${pet.name}? Todos os registros serão apagados.`,
++  540       async () => {
++  541         if (useFirebase) {
++  542           try {
++  543             const evSnap = await fbDb.collection("users").doc(user.uid)
++  544               .collection("events").where("petId", "==", pet.id).get();
++  545             const batch = fbDb.batch();
++  546             evSnap.docs.forEach(doc => batch.delete(doc.ref));
++  547             batch.delete(fbDb.collection("users").doc(user.uid).collection("pets").doc(pet.id));
++  548             await batch.commit();
++  549             showToast(`${pet.name} removido`, "info");
++  550           } catch(err) {
++  551             showToast("Erro ao excluir pet", "error");
++  552             return;
++  553           }
++  554         } else {
++  555           setPets(prev => prev.filter(p => p.id !== pet.id));
++  556           setEvents(prev => prev.filter(ev => ev.petId !== pet.id));
++  557           showToast(`${pet.name} removido`, "info");
++  558         }
++  559         if (selectedPetId === pet.id) setSelectedPetId(null);
++  560       }
++  561     );
++  562   };
++  563 
++  564   /* ===== SAÚDE — CRUD ===== */
++  565   const addHealthRecord = async (e) => {
++  566     e.preventDefault();
++  567     const form = new FormData(e.target);
++  568     const newRecord = {
++  569       id: Date.now().toString(),
++  570       description: form.get("description"),
++  571       date: new Date().toLocaleDateString('pt-BR'),
++  572       type: form.get("type")
++  573     };
++  574 
++  575     if (useFirebase) {
++  576       try {
++  577         await fbDb.collection("users").doc(user.uid).collection("pets").doc(selectedPetId)
++  578           .update({ healthRecords: firebase.firestore.FieldValue.arrayUnion(newRecord) });
++  579         showToast("Registro de saúde adicionado! 💊", "success");
++  580       } catch(err) {
++  581         showToast("Erro ao registrar saúde", "error");
++  582         return;
++  583       }
++  584     } else {
++  585       setPets(prev => prev.map(pet =>
++  586         pet.id === selectedPetId
++  587           ? { ...pet, healthRecords: [...pet.healthRecords, newRecord] }
++  588           : pet
++  589       ));
++  590       showToast("Registro de saúde adicionado! 💊", "success");
++  591     }
++  592     setShowAddHealth(false);
++  593     e.target.reset();
++  594   };
++  595 
++  596   const deleteHealthRecord = (record) => {
++  597     showConfirm("Excluir Registro", "Deseja excluir este registro de saúde?", async () => {
++  598       if (useFirebase) {
++  599         try {
++  600           const petRef = fbDb.collection("users").doc(user.uid).collection("pets").doc(selectedPetId);
++  601           const petDoc = await petRef.get();
++  602           const updated = petDoc.data().healthRecords.filter(r => r.id !== record.id);
++  603           await petRef.update({ healthRecords: updated });
++  604           showToast("Registro removido", "info");
++  605         } catch(err) {
++  606           showToast("Erro ao excluir registro", "error");
++  607         }
++  608       } else {
++  609         setPets(prev => prev.map(pet =>
++  610           pet.id === selectedPetId
++  611             ? { ...pet, healthRecords: pet.healthRecords.filter(r => r.id !== record.id) }
++  612             : pet
++  613         ));
++  614         showToast("Registro removido", "info");
++  615       }
++  616     });
++  617   };
++  618 
++  619   /* ===== EVENTOS — CRUD ===== */
++  620   const addEvent = async (e) => {
++  621     e.preventDefault();
++  622     const form = new FormData(e.target);
++  623     const eventData = {
++  624       petId: selectedPetId,
++  625       description: form.get("description"),
++  626       date: form.get("date"),
++  627       time: form.get("time"),
++  628       type: form.get("type"),
++  629       completed: false,
++  630       createdAt: new Date().toISOString()
 +  631     };
 +  632 
 +  633     if (useFirebase) {
 +  634       try {
-+  635         await fbDb.collection("users").doc(user.uid).collection("events").doc(editingEvent.id).update(updates);
-+  636         showToast("Evento atualizado!", "success");
++  635         await fbDb.collection("users").doc(user.uid).collection("events").add(eventData);
++  636         showToast("Evento agendado! 📅", "success");
 +  637       } catch(err) {
-+  638         showToast("Erro ao atualizar evento", "error");
++  638         showToast("Erro ao agendar evento", "error");
 +  639         return;
 +  640       }
 +  641     } else {
-+  642       setEvents(prev => prev.map(ev => ev.id === editingEvent.id ? { ...ev, ...updates } : ev));
-+  643       showToast("Evento atualizado!", "success");
++  642       setEvents(prev => [...prev, { ...eventData, id: Date.now().toString() }]);
++  643       showToast("Evento agendado! 📅", "success");
 +  644     }
-+  645     setEditingEvent(null);
-+  646   };
-+  647 
-+  648   const toggleEventComplete = async (event) => {
-+  649     if (useFirebase) {
-+  650       try {
-+  651         await fbDb.collection("users").doc(user.uid).collection("events").doc(event.id)
-+  652           .update({ completed: !event.completed });
-+  653       } catch(err) {
-+  654         showToast("Erro ao atualizar evento", "error");
-+  655       }
-+  656     } else {
-+  657       setEvents(prev => prev.map(e => e.id === event.id ? { ...e, completed: !e.completed } : e));
-+  658     }
-+  659   };
-+  660 
-+  661   const deleteEvent = (event) => {
-+  662     showConfirm("Excluir Evento", `Deseja excluir "${event.description}"?`, async () => {
-+  663       if (useFirebase) {
-+  664         try {
-+  665           await fbDb.collection("users").doc(user.uid).collection("events").doc(event.id).delete();
-+  666           showToast("Evento removido", "info");
-+  667         } catch(err) {
-+  668           showToast("Erro ao excluir evento", "error");
-+  669         }
-+  670       } else {
-+  671         setEvents(prev => prev.filter(e => e.id !== event.id));
-+  672         showToast("Evento removido", "info");
-+  673       }
-+  674     });
-+  675   };
-+  676 
-+  677   /* ===== UTILS ===== */
-+  678   const getPetEvents = () => {
-+  679     return events
-+  680       .filter(e => e.petId === selectedPetId)
-+  681       .sort((a, b) => {
-+  682         if (a.completed !== b.completed) return a.completed ? 1 : -1;
-+  683         return new Date(a.date + 'T' + (a.time || '00:00')) - new Date(b.date + 'T' + (b.time || '00:00'));
-+  684       });
++  645     setShowAddEvent(false);
++  646     e.target.reset();
++  647   };
++  648 
++  649   const updateEvent = async (e) => {
++  650     e.preventDefault();
++  651     const form = new FormData(e.target);
++  652     const updates = {
++  653       description: form.get("description"),
++  654       date: form.get("date"),
++  655       time: form.get("time"),
++  656       type: form.get("type")
++  657     };
++  658 
++  659     if (useFirebase) {
++  660       try {
++  661         await fbDb.collection("users").doc(user.uid).collection("events").doc(editingEvent.id).update(updates);
++  662         showToast("Evento atualizado! ✏️", "success");
++  663       } catch(err) {
++  664         showToast("Erro ao atualizar evento", "error");
++  665         return;
++  666       }
++  667     } else {
++  668       setEvents(prev => prev.map(ev => ev.id === editingEvent.id ? { ...ev, ...updates } : ev));
++  669       showToast("Evento atualizado! ✏️", "success");
++  670     }
++  671     setEditingEvent(null);
++  672   };
++  673 
++  674   const toggleEventComplete = async (event) => {
++  675     if (useFirebase) {
++  676       try {
++  677         await fbDb.collection("users").doc(user.uid).collection("events").doc(event.id)
++  678           .update({ completed: !event.completed });
++  679       } catch(err) {
++  680         showToast("Erro ao atualizar evento", "error");
++  681       }
++  682     } else {
++  683       setEvents(prev => prev.map(e => e.id === event.id ? { ...e, completed: !e.completed } : e));
++  684     }
 +  685   };
 +  686 
-+  687   const getSpeciesIcon = (s) => ({ dog: '\u{1F415}', cat: '\u{1F431}', other: '\u{1F43E}' }[s] || '\u{1F43E}');
-+  688   const getSpeciesLabel = (s) => ({ dog: 'Cachorro', cat: 'Gato', other: 'Outro' }[s] || 'Outro');
-+  689   const getEventTypeIcon = (t) => ({ vacina: '\u{1F489}', consulta: '\u{1FA7A}', banho: '\u{1F6C1}', outro: '\u{1F4CC}' }[t] || '\u{1F4CC}');
-+  690   const getHealthTypeIcon = (t) => ({ consulta: '\u{1FA7A}', vacina: '\u{1F489}', exame: '\u{1F52C}', tratamento: '\u{1F48A}', outro: '\u{1F4CC}' }[t] || '\u{1F4CC}');
-+  691 
-+  692   /* ===== LOADING ===== */
-+  693   if (authLoading) {
-+  694     return (
-+  695       <div className="min-h-screen flex flex-col items-center justify-center">
-+  696         <div className="spinner mb-4"></div>
-+  697         <p className="text-gray-500 font-semibold">Carregando PetVida...</p>
-+  698       </div>
-+  699     );
-+  700   }
-+  701 
-+  702   /* ===== TELA LOGIN / REGISTRO ===== */
-+  703   if (!user) {
-+  704     return (
-+  705       <div className="min-h-screen flex items-center justify-center p-6">
-+  706         <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md fade-in">
-+  707           <div className="text-center mb-6">
-+  708             <div className="text-6xl mb-3">{'\u{1F43E}'}</div>
-+  709             <h1 className="text-3xl font-bold text-orange-500">PetVida</h1>
-+  710             <p className="text-gray-500">Cuidados Inteligentes para seu Pet</p>
-+  711             {!useFirebase && (
-+  712               <p className="text-xs text-amber-600 mt-2 bg-amber-50 px-3 py-1 rounded-lg inline-block">
-+  713                 <i className="fas fa-info-circle mr-1"></i>Modo offline (localStorage)
-+  714               </p>
-+  715             )}
-+  716           </div>
++  687   const deleteEvent = (event) => {
++  688     showConfirm("Excluir Evento", `Deseja excluir "${event.description}"?`, async () => {
++  689       if (useFirebase) {
++  690         try {
++  691           await fbDb.collection("users").doc(user.uid).collection("events").doc(event.id).delete();
++  692           showToast("Evento removido", "info");
++  693         } catch(err) {
++  694           showToast("Erro ao excluir evento", "error");
++  695         }
++  696       } else {
++  697         setEvents(prev => prev.filter(e => e.id !== event.id));
++  698         showToast("Evento removido", "info");
++  699       }
++  700     });
++  701   };
++  702 
++  703   /* ===== UTILITÁRIOS ===== */
++  704   const getPetEvents = () => {
++  705     return events
++  706       .filter(e => e.petId === selectedPetId)
++  707       .sort((a, b) => {
++  708         if (a.completed !== b.completed) return a.completed ? 1 : -1;
++  709         return new Date(a.date + 'T' + (a.time || '00:00')) - new Date(b.date + 'T' + (b.time || '00:00'));
++  710       });
++  711   };
++  712 
++  713   const getSpeciesIcon = (s) => ({ dog: '🐕', cat: '🐱', other: '🐾' }[s] || '🐾');
++  714   const getSpeciesLabel = (s) => ({ dog: 'Cachorro', cat: 'Gato', other: 'Outro' }[s] || 'Outro');
++  715   const getEventTypeIcon = (t) => ({ vacina: '💉', consulta: '🩺', banho: '🛁', outro: '📌' }[t] || '📌');
++  716   const getHealthTypeIcon = (t) => ({ consulta: '🩺', vacina: '💉', exame: '🔬', tratamento: '💊', outro: '📌' }[t] || '📌');
 +  717 
-+  718           <div className="flex mb-6 bg-gray-100 rounded-xl p-1">
-+  719             <button onClick={() => { setIsLogin(true); setAuthError(""); }}
-+  720               className={`flex-1 py-2 rounded-lg font-semibold transition-all ${isLogin ? 'bg-white shadow text-orange-500' : 'text-gray-500'}`}>
-+  721               Entrar
-+  722             </button>
-+  723             <button onClick={() => { setIsLogin(false); setAuthError(""); }}
-+  724               className={`flex-1 py-2 rounded-lg font-semibold transition-all ${!isLogin ? 'bg-white shadow text-orange-500' : 'text-gray-500'}`}>
-+  725               Criar Conta
-+  726             </button>
-+  727           </div>
-+  728 
-+  729           {authError && (
-+  730             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-semibold flex items-center gap-2">
-+  731               <i className="fas fa-exclamation-circle"></i> {authError}
-+  732             </div>
-+  733           )}
-+  734 
-+  735           {isLogin ? (
-+  736             <form onSubmit={handleLogin} className="space-y-4">
-+  737               <Input name="email" type="email" placeholder="E-mail" required />
-+  738               <Input name="password" type="password" placeholder="Senha" required />
-+  739               <Button type="submit">Entrar</Button>
-+  740             </form>
-+  741           ) : (
-+  742             <form onSubmit={handleRegister} className="space-y-4">
-+  743               <Input name="name" placeholder="Seu nome" required />
-+  744               <Input name="email" type="email" placeholder="E-mail" required />
-+  745               <div>
-+  746                 <label className="block text-sm font-semibold text-gray-700 mb-1">Senha</label>
-+  747                 <input type="password" name="password" placeholder="Senha (min. 6 caracteres)" required
-+  748                   value={registerPassword} onChange={(e) => setRegisterPassword(e.target.value)}
-+  749                   className={`w-full p-3 border-2 ${registerPassword && registerPassword.length < 6 ? 'border-red-400 bg-red-50' : 'border-gray-200'} rounded-xl focus:border-orange-500 focus:outline-none transition-colors`}
-+  750                 />
-+  751                 <PasswordStrength password={registerPassword} />
-+  752                 {registerPassword && registerPassword.length < 6 && (
-+  753                   <p className="text-red-500 text-xs mt-1 font-semibold">Minimo 6 caracteres</p>
-+  754                 )}
-+  755               </div>
-+  756               <Button type="submit" disabled={registerPassword.length < 6}>Criar Conta</Button>
-+  757             </form>
-+  758           )}
-+  759         </div>
-+  760         <ToastContainer toasts={toasts} />
-+  761       </div>
-+  762     );
-+  763   }
-+  764 
-+  765   /* ===== APP PRINCIPAL ===== */
-+  766   return (
-+  767     <div className="max-w-lg mx-auto p-4 pb-24">
-+  768 
-+  769       {/* HEADER */}
-+  770       <header className="flex justify-between items-center mb-6 fade-in">
-+  771         <div>
-+  772           <h1 className="text-2xl font-bold text-orange-500">
-+  773             Ola, {user.name ? user.name.split(' ')[0] : 'Usuario'}! {'\u{1F43E}'}
-+  774           </h1>
-+  775           <p className="text-gray-500 text-sm">
-+  776             {pets.length} pet(s) cadastrado(s)
-+  777             {!useFirebase && <span className="ml-2 text-amber-500"><i className="fas fa-database text-xs"></i> local</span>}
-+  778           </p>
-+  779         </div>
-+  780         <button onClick={logout} className="text-red-500 font-bold hover:bg-red-50 p-2 rounded-lg transition-colors" title="Sair">
-+  781           <i className="fas fa-sign-out-alt text-lg"></i>
-+  782         </button>
-+  783       </header>
-+  784 
-+  785       {/* BANNER NOTIFICACOES */}
-+  786       {"Notification" in window && Notification.permission !== "granted" && (
-+  787         <Card className="mb-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-+  788           <div className="flex items-center justify-between">
-+  789             <div className="flex items-center gap-3">
-+  790               <i className="fas fa-bell text-xl"></i>
-+  791               <div>
-+  792                 <p className="font-bold">Notificacoes</p>
-+  793                 <p className="text-sm opacity-80">Receba lembretes dos cuidados</p>
-+  794               </div>
-+  795             </div>
-+  796             <button onClick={enableNotifications} className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg font-semibold transition-colors">
-+  797               Ativar
-+  798             </button>
-+  799           </div>
-+  800         </Card>
-+  801       )}
-+  802 
-+  803       {/* TABS */}
-+  804       <div className="flex gap-2 mb-4 overflow-x-auto">
-+  805         {[
-+  806           { id: 'pets', icon: 'fas fa-paw', label: 'Pets' },
-+  807           { id: 'events', icon: 'fas fa-calendar', label: 'Agenda' },
-+  808           { id: 'health', icon: 'fas fa-heartbeat', label: 'Saude' }
-+  809         ].map(tab => (
-+  810           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-+  811             className={`flex items-center gap-2 px-4 py-3 rounded-xl font-semibold whitespace-nowrap transition-all ${
-+  812               activeTab === tab.id ? 'bg-orange-500 text-white shadow-lg' : 'bg-white text-gray-600 hover:bg-gray-100'
-+  813             }`}>
-+  814             <i className={tab.icon}></i> {tab.label}
-+  815           </button>
-+  816         ))}
-+  817       </div>
-+  818 
-+  819       {/* ========== TAB: PETS ========== */}
-+  820       {activeTab === 'pets' && (
-+  821         <div className="space-y-4 fade-in">
-+  822           <div className="flex justify-between items-center">
-+  823             <h2 className="text-lg font-bold text-gray-800">Meus Pets</h2>
-+  824             <button onClick={() => setShowAddPet(true)}
-+  825               className="bg-orange-500 text-white px-4 py-2 rounded-xl font-semibold hover:bg-orange-600 transition-colors">
-+  826               <i className="fas fa-plus mr-2"></i>Adicionar
-+  827             </button>
-+  828           </div>
-+  829 
-+  830           {pets.length === 0 ? (
-+  831             <Card className="text-center py-10">
-+  832               <div className="text-6xl mb-4">{'\u{1F43E}'}</div>
-+  833               <p className="text-gray-500 font-semibold">Nenhum pet cadastrado</p>
-+  834               <p className="text-gray-400 text-sm">Adicione seu primeiro pet!</p>
-+  835             </Card>
-+  836           ) : (
-+  837             pets.map(pet => (
-+  838               <Card key={pet.id}
-+  839                 className={`pet-card cursor-pointer ${selectedPetId === pet.id ? 'ring-2 ring-orange-500 bg-orange-50/50' : ''}`}
-+  840                 onClick={() => setSelectedPetId(pet.id)}>
-+  841                 <div className="flex items-center gap-4">
-+  842                   <div className="relative">
-+  843                     <img src={pet.avatar} alt={pet.name} className="w-16 h-16 rounded-full bg-orange-100"
-+  844                       onError={(e) => { e.target.style.display = 'none'; }} />
-+  845                     <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center text-3xl absolute inset-0 -z-10">
-+  846                       {getSpeciesIcon(pet.species)}
-+  847                     </div>
-+  848                   </div>
-+  849                   <div className="flex-1 min-w-0">
-+  850                     <h3 className="font-bold text-lg text-gray-800">{getSpeciesIcon(pet.species)} {pet.name}</h3>
-+  851                     <p className="text-gray-500 text-sm">
-+  852                       {pet.breed || getSpeciesLabel(pet.species)}
-+  853                       {pet.age ? ` \u2022 ${pet.age} anos` : ''}
-+  854                       {pet.weight ? ` \u2022 ${pet.weight}kg` : ''}
-+  855                     </p>
-+  856                     <p className="text-gray-400 text-xs mt-1">
-+  857                       {(pet.healthRecords || []).length} registro(s) de saude
-+  858                     </p>
-+  859                   </div>
-+  860                   <div className="flex flex-col gap-1">
-+  861                     <button onClick={(e) => { e.stopPropagation(); setEditingPet(pet); }}
-+  862                       className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors" title="Editar">
-+  863                       <i className="fas fa-edit"></i>
-+  864                     </button>
-+  865                     <button onClick={(e) => { e.stopPropagation(); deletePet(pet); }}
-+  866                       className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Excluir">
-+  867                       <i className="fas fa-trash"></i>
-+  868                     </button>
-+  869                   </div>
-+  870                 </div>
-+  871               </Card>
-+  872             ))
-+  873           )}
-+  874         </div>
-+  875       )}
-+  876 
-+  877       {/* ========== TAB: AGENDA ========== */}
-+  878       {activeTab === 'events' && (
-+  879         <div className="space-y-4 fade-in">
-+  880           {currentPet ? (
-+  881             <>
-+  882               <div className="flex justify-between items-center">
-+  883                 <h2 className="text-lg font-bold text-gray-800">Agenda de {currentPet.name}</h2>
-+  884                 <button onClick={() => setShowAddEvent(true)}
-+  885                   className="bg-blue-500 text-white px-4 py-2 rounded-xl font-semibold hover:bg-blue-600 transition-colors">
-+  886                   <i className="fas fa-plus mr-2"></i>Agendar
-+  887                 </button>
-+  888               </div>
-+  889 
-+  890               {getPetEvents().length === 0 ? (
-+  891                 <Card className="text-center py-10">
-+  892                   <div className="text-6xl mb-4">{'\u{1F4C5}'}</div>
-+  893                   <p className="text-gray-500 font-semibold">Nenhum evento agendado</p>
-+  894                   <p className="text-gray-400 text-sm">Agende vacinas, consultas e mais!</p>
-+  895                 </Card>
-+  896               ) : (
-+  897                 getPetEvents().map(event => (
-+  898                   <Card key={event.id} className={event.completed ? 'opacity-60 bg-gray-50' : ''}>
-+  899                     <div className="flex items-center gap-3">
-+  900                       <div className="text-2xl">{getEventTypeIcon(event.type)}</div>
-+  901                       <div className="flex-1 min-w-0">
-+  902                         <p className={`font-semibold ${event.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}>
-+  903                           {event.description}
-+  904                         </p>
-+  905                         <p className="text-gray-500 text-sm">
-+  906                           {new Date(event.date + 'T00:00:00').toLocaleDateString('pt-BR')} as {event.time}
-+  907                         </p>
-+  908                       </div>
-+  909                       <div className="flex items-center gap-1">
-+  910                         <button onClick={() => toggleEventComplete(event)}
-+  911                           className={`p-2 rounded-lg transition-colors ${event.completed ? 'text-green-500' : 'text-gray-300 hover:text-green-500'}`}
-+  912                           title={event.completed ? "Desmarcar" : "Concluir"}>
-+  913                           <i className={`fas ${event.completed ? 'fa-check-circle' : 'fa-circle'} text-lg`}></i>
-+  914                         </button>
-+  915                         {!event.completed && (
-+  916                           <button onClick={() => setEditingEvent(event)}
-+  917                             className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors" title="Editar">
-+  918                             <i className="fas fa-edit"></i>
-+  919                           </button>
-+  920                         )}
-+  921                         <button onClick={() => deleteEvent(event)}
-+  922                           className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Excluir">
-+  923                           <i className="fas fa-trash"></i>
-+  924                         </button>
-+  925                       </div>
-+  926                     </div>
-+  927                   </Card>
-+  928                 ))
-+  929               )}
-+  930             </>
-+  931           ) : (
-+  932             <Card className="text-center py-10 bg-yellow-50/80 border border-yellow-200">
-+  933               <div className="text-5xl mb-3">{'\u{1F446}'}</div>
-+  934               <p className="text-yellow-700 font-semibold">Selecione um pet primeiro</p>
-+  935               <p className="text-yellow-600 text-sm mt-1">Va ate a aba "Pets" e selecione um para ver a agenda</p>
-+  936             </Card>
-+  937           )}
-+  938         </div>
-+  939       )}
-+  940 
-+  941       {/* ========== TAB: SAUDE ========== */}
-+  942       {activeTab === 'health' && (
-+  943         <div className="space-y-4 fade-in">
-+  944           {currentPet ? (
-+  945             <>
-+  946               <div className="flex justify-between items-center">
-+  947                 <h2 className="text-lg font-bold text-gray-800">Saude de {currentPet.name}</h2>
-+  948                 <button onClick={() => setShowAddHealth(true)}
-+  949                   className="bg-green-500 text-white px-4 py-2 rounded-xl font-semibold hover:bg-green-600 transition-colors">
-+  950                   <i className="fas fa-plus mr-2"></i>Registrar
-+  951                 </button>
-+  952               </div>
-+  953 
-+  954               {(!currentPet.healthRecords || currentPet.healthRecords.length === 0) ? (
-+  955                 <Card className="text-center py-10">
-+  956                   <div className="text-6xl mb-4">{'\u{1F48A}'}</div>
-+  957                   <p className="text-gray-500 font-semibold">Nenhum registro de saude</p>
-+  958                   <p className="text-gray-400 text-sm">Registre vacinas, consultas e exames</p>
-+  959                 </Card>
-+  960               ) : (
-+  961                 currentPet.healthRecords.map(record => (
-+  962                   <Card key={record.id} className="border-l-4 border-green-500">
-+  963                     <div className="flex justify-between items-start">
-+  964                       <div>
-+  965                         <p className="font-semibold text-gray-800">
-+  966                           {getHealthTypeIcon(record.type)} {record.description}
-+  967                         </p>
-+  968                         <p className="text-gray-500 text-sm">{record.date}</p>
-+  969                       </div>
-+  970                       <button onClick={() => deleteHealthRecord(record)}
-+  971                         className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Excluir">
-+  972                         <i className="fas fa-trash"></i>
-+  973                       </button>
-+  974                     </div>
-+  975                   </Card>
-+  976                 ))
-+  977               )}
-+  978             </>
-+  979           ) : (
-+  980             <Card className="text-center py-10 bg-yellow-50/80 border border-yellow-200">
-+  981               <div className="text-5xl mb-3">{'\u{1F446}'}</div>
-+  982               <p className="text-yellow-700 font-semibold">Selecione um pet primeiro</p>
-+  983               <p className="text-yellow-600 text-sm mt-1">Va ate a aba "Pets" e selecione um para ver o historico</p>
-+  984             </Card>
-+  985           )}
-+  986         </div>
-+  987       )}
-+  988 
-+  989       {/* ========== MODAIS ========== */}
-+  990 
-+  991       {/* Adicionar Pet */}
-+  992       <Modal isOpen={showAddPet} onClose={() => setShowAddPet(false)} title="Adicionar Pet">
-+  993         <form onSubmit={addPet} className="space-y-4">
-+  994           <Input name="name" label="Nome do Pet" placeholder="Ex: Rex" required />
-+  995           <Input name="breed" label="Raca" placeholder="Ex: Golden Retriever" />
-+  996           <Input name="age" label="Idade (anos)" type="number" placeholder="Ex: 3" />
-+  997           <Input name="weight" label="Peso (kg)" type="number" placeholder="Ex: 25" />
-+  998           <div>
-+  999             <label className="block text-sm font-semibold text-gray-700 mb-1">Especie</label>
-+ 1000             <select name="species" className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none">
-+ 1001               <option value="dog">{'\u{1F415}'} Cachorro</option>
-+ 1002               <option value="cat">{'\u{1F431}'} Gato</option>
-+ 1003               <option value="other">{'\u{1F43E}'} Outro</option>
-+ 1004             </select>
-+ 1005           </div>
-+ 1006           <div className="flex gap-3 pt-4">
-+ 1007             <Button variant="secondary" onClick={() => setShowAddPet(false)} className="flex-1">Cancelar</Button>
-+ 1008             <Button type="submit" className="flex-1">Adicionar</Button>
-+ 1009           </div>
-+ 1010         </form>
-+ 1011       </Modal>
-+ 1012 
-+ 1013       {/* Editar Pet */}
-+ 1014       <Modal isOpen={!!editingPet} onClose={() => setEditingPet(null)} title="Editar Pet">
-+ 1015         {editingPet && (
-+ 1016           <form key={editingPet.id} onSubmit={updatePet} className="space-y-4">
-+ 1017             <Input name="name" label="Nome do Pet" defaultValue={editingPet.name} required />
-+ 1018             <Input name="breed" label="Raca" defaultValue={editingPet.breed} />
-+ 1019             <Input name="age" label="Idade (anos)" type="number" defaultValue={editingPet.age} />
-+ 1020             <Input name="weight" label="Peso (kg)" type="number" defaultValue={editingPet.weight} />
-+ 1021             <div>
-+ 1022               <label className="block text-sm font-semibold text-gray-700 mb-1">Especie</label>
-+ 1023               <select name="species" defaultValue={editingPet.species} className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none">
-+ 1024                 <option value="dog">{'\u{1F415}'} Cachorro</option>
-+ 1025                 <option value="cat">{'\u{1F431}'} Gato</option>
-+ 1026                 <option value="other">{'\u{1F43E}'} Outro</option>
-+ 1027               </select>
-+ 1028             </div>
-+ 1029             <div className="flex gap-3 pt-4">
-+ 1030               <Button variant="secondary" onClick={() => setEditingPet(null)} className="flex-1">Cancelar</Button>
-+ 1031               <Button type="submit" variant="info" className="flex-1">Salvar</Button>
-+ 1032             </div>
-+ 1033           </form>
-+ 1034         )}
-+ 1035       </Modal>
-+ 1036 
-+ 1037       {/* Adicionar Evento */}
-+ 1038       <Modal isOpen={showAddEvent} onClose={() => setShowAddEvent(false)} title="Agendar Evento">
-+ 1039         <form onSubmit={addEvent} className="space-y-4">
-+ 1040           <Input name="description" label="Descricao" placeholder="Ex: Vacina antirrabica" required />
-+ 1041           <Input name="date" label="Data" type="date" required />
-+ 1042           <Input name="time" label="Horario" type="time" required />
-+ 1043           <div>
-+ 1044             <label className="block text-sm font-semibold text-gray-700 mb-1">Tipo</label>
-+ 1045             <select name="type" className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
-+ 1046               <option value="vacina">{'\u{1F489}'} Vacina</option>
-+ 1047               <option value="consulta">{'\u{1FA7A}'} Consulta</option>
-+ 1048               <option value="banho">{'\u{1F6C1}'} Banho</option>
-+ 1049               <option value="outro">{'\u{1F4CC}'} Outro</option>
-+ 1050             </select>
-+ 1051           </div>
-+ 1052           <div className="flex gap-3 pt-4">
-+ 1053             <Button variant="secondary" onClick={() => setShowAddEvent(false)} className="flex-1">Cancelar</Button>
-+ 1054             <Button type="submit" variant="info" className="flex-1">Agendar</Button>
-+ 1055           </div>
-+ 1056         </form>
-+ 1057       </Modal>
-+ 1058 
-+ 1059       {/* Editar Evento */}
-+ 1060       <Modal isOpen={!!editingEvent} onClose={() => setEditingEvent(null)} title="Editar Evento">
-+ 1061         {editingEvent && (
-+ 1062           <form key={editingEvent.id} onSubmit={updateEvent} className="space-y-4">
-+ 1063             <Input name="description" label="Descricao" defaultValue={editingEvent.description} required />
-+ 1064             <Input name="date" label="Data" type="date" defaultValue={editingEvent.date} required />
-+ 1065             <Input name="time" label="Horario" type="time" defaultValue={editingEvent.time} required />
-+ 1066             <div>
-+ 1067               <label className="block text-sm font-semibold text-gray-700 mb-1">Tipo</label>
-+ 1068               <select name="type" defaultValue={editingEvent.type} className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
-+ 1069                 <option value="vacina">{'\u{1F489}'} Vacina</option>
-+ 1070                 <option value="consulta">{'\u{1FA7A}'} Consulta</option>
-+ 1071                 <option value="banho">{'\u{1F6C1}'} Banho</option>
-+ 1072                 <option value="outro">{'\u{1F4CC}'} Outro</option>
-+ 1073               </select>
-+ 1074             </div>
-+ 1075             <div className="flex gap-3 pt-4">
-+ 1076               <Button variant="secondary" onClick={() => setEditingEvent(null)} className="flex-1">Cancelar</Button>
-+ 1077               <Button type="submit" variant="info" className="flex-1">Salvar</Button>
-+ 1078             </div>
-+ 1079           </form>
-+ 1080         )}
-+ 1081       </Modal>
-+ 1082 
-+ 1083       {/* Registrar Saude */}
-+ 1084       <Modal isOpen={showAddHealth} onClose={() => setShowAddHealth(false)} title="Registrar Saude">
-+ 1085         <form onSubmit={addHealthRecord} className="space-y-4">
-+ 1086           <Input name="description" label="Descricao" placeholder="Ex: Consulta de rotina" required />
-+ 1087           <div>
-+ 1088             <label className="block text-sm font-semibold text-gray-700 mb-1">Tipo</label>
-+ 1089             <select name="type" className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none">
-+ 1090               <option value="consulta">{'\u{1FA7A}'} Consulta</option>
-+ 1091               <option value="vacina">{'\u{1F489}'} Vacina</option>
-+ 1092               <option value="exame">{'\u{1F52C}'} Exame</option>
-+ 1093               <option value="tratamento">{'\u{1F48A}'} Tratamento</option>
-+ 1094               <option value="outro">{'\u{1F4CC}'} Outro</option>
-+ 1095             </select>
-+ 1096           </div>
-+ 1097           <div className="flex gap-3 pt-4">
-+ 1098             <Button variant="secondary" onClick={() => setShowAddHealth(false)} className="flex-1">Cancelar</Button>
-+ 1099             <Button type="submit" variant="success" className="flex-1">Registrar</Button>
-+ 1100           </div>
-+ 1101         </form>
-+ 1102       </Modal>
-+ 1103 
-+ 1104       {/* CONFIRM DIALOG */}
-+ 1105       <ConfirmDialog dialog={confirmDialog} onClose={() => setConfirmDialog(null)} />
-+ 1106 
-+ 1107       {/* TOASTS */}
-+ 1108       <ToastContainer toasts={toasts} />
-+ 1109 
-+ 1110       {/* BOTTOM NAV */}
-+ 1111       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3">
-+ 1112         <div className="max-w-lg mx-auto flex justify-around">
-+ 1113           {[
-+ 1114             { id: 'pets', icon: 'fas fa-paw', label: 'Pets' },
-+ 1115             { id: 'events', icon: 'fas fa-calendar', label: 'Agenda' },
-+ 1116             { id: 'health', icon: 'fas fa-heartbeat', label: 'Saude' }
-+ 1117           ].map(tab => (
-+ 1118             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-+ 1119               className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
-+ 1120                 activeTab === tab.id ? 'text-orange-500' : 'text-gray-400'
-+ 1121               }`}>
-+ 1122               <i className={`${tab.icon} text-xl`}></i>
-+ 1123               <span className="text-xs font-semibold">{tab.label}</span>
-+ 1124             </button>
-+ 1125           ))}
-+ 1126         </div>
-+ 1127       </nav>
-+ 1128     </div>
-+ 1129   );
-+ 1130 }
-+ 1131 
-+ 1132 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-+ 1133 </script>
-+ 1134 
-+ 1135 <!-- Service Worker -->
-+ 1136 <script>
-+ 1137 if ('serviceWorker' in navigator) {
-+ 1138   const swCode = `
-+ 1139     const CACHE_NAME = 'petvida-v2';
-+ 1140     self.addEventListener('install', e => {
-+ 1141       e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['/', '/index.html'])));
-+ 1142       self.skipWaiting();
-+ 1143     });
-+ 1144     self.addEventListener('activate', e => {
-+ 1145       e.waitUntil(caches.keys().then(keys =>
-+ 1146         Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-+ 1147       ));
-+ 1148     });
-+ 1149     self.addEventListener('fetch', e => {
-+ 1150       e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-+ 1151     });
-+ 1152   `;
-+ 1153   const blob = new Blob([swCode], { type: 'application/javascript' });
-+ 1154   navigator.serviceWorker.register(URL.createObjectURL(blob))
-+ 1155     .then(() => console.log("Service Worker registrado"))
-+ 1156     .catch(err => console.log("Erro SW:", err));
-+ 1157 }
-+ 1158 </script>
-+ 1159 
-+ 1160 </body>
-+ 1161 </html>
++  718   /* ===============================================
++  719      RENDERS
++  720      =============================================== */
++  721 
++  722   /* ===== LOADING ===== */
++  723   if (authLoading) {
++  724     return (
++  725       <div className="min-h-screen flex flex-col items-center justify-center">
++  726         <div className="spinner mb-4"></div>
++  727         <p className="text-gray-500 font-semibold">Carregando PetVida...</p>
++  728       </div>
++  729     );
++  730   }
++  731 
++  732   /* ===== TELA DE LOGIN / REGISTRO ===== */
++  733   if (!user) {
++  734     return (
++  735       <div className="min-h-screen flex items-center justify-center p-6">
++  736         <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md fade-in">
++  737           <div className="text-center mb-6">
++  738             <div className="text-6xl mb-3">🐾</div>
++  739             <h1 className="text-3xl font-bold text-orange-500">PetVida</h1>
++  740             <p className="text-gray-500">Cuidados Inteligentes para seu Pet</p>
++  741             {!useFirebase && (
++  742               <p className="text-xs text-amber-600 mt-2 bg-amber-50 px-3 py-1 rounded-lg inline-block">
++  743                 <i className="fas fa-info-circle mr-1"></i>Modo offline (localStorage)
++  744               </p>
++  745             )}
++  746           </div>
++  747 
++  748           {/* Abas Entrar / Criar Conta */}
++  749           <div className="flex mb-6 bg-gray-100 rounded-xl p-1">
++  750             <button onClick={() => { setIsLogin(true); setAuthError(""); }}
++  751               className={`flex-1 py-2 rounded-lg font-semibold transition-all ${isLogin ? 'bg-white shadow text-orange-500' : 'text-gray-500'}`}>
++  752               Entrar
++  753             </button>
++  754             <button onClick={() => { setIsLogin(false); setAuthError(""); }}
++  755               className={`flex-1 py-2 rounded-lg font-semibold transition-all ${!isLogin ? 'bg-white shadow text-orange-500' : 'text-gray-500'}`}>
++  756               Criar Conta
++  757             </button>
++  758           </div>
++  759 
++  760           {/* Mensagem de erro */}
++  761           {authError && (
++  762             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-semibold flex items-center gap-2">
++  763               <i className="fas fa-exclamation-circle"></i> {authError}
++  764             </div>
++  765           )}
++  766 
++  767           {isLogin ? (
++  768             <form onSubmit={handleLogin} className="space-y-4">
++  769               <Input name="email" type="email" placeholder="E-mail" required />
++  770               <Input name="password" type="password" placeholder="Senha" required />
++  771               <Button type="submit">Entrar</Button>
++  772             </form>
++  773           ) : (
++  774             <form onSubmit={handleRegister} className="space-y-4">
++  775               <Input name="name" placeholder="Seu nome" required />
++  776               <Input name="email" type="email" placeholder="E-mail" required />
++  777               <div>
++  778                 <label className="block text-sm font-semibold text-gray-700 mb-1">Senha</label>
++  779                 <input type="password" name="password" placeholder="Senha (mín. 6 caracteres)" required
++  780                   value={registerPassword} onChange={(e) => setRegisterPassword(e.target.value)}
++  781                   className={`w-full p-3 border-2 ${registerPassword && registerPassword.length < 6 ? 'border-red-400 bg-red-50' : 'border-gray-200'} rounded-xl focus:border-orange-500 focus:outline-none transition-colors`}
++  782                 />
++  783                 <PasswordStrength password={registerPassword} />
++  784                 {registerPassword && registerPassword.length < 6 && (
++  785                   <p className="text-red-500 text-xs mt-1 font-semibold">Mínimo 6 caracteres</p>
++  786                 )}
++  787               </div>
++  788               <Button type="submit" disabled={registerPassword.length < 6}>Criar Conta</Button>
++  789             </form>
++  790           )}
++  791         </div>
++  792         <ToastContainer toasts={toasts} />
++  793       </div>
++  794     );
++  795   }
++  796 
++  797   /* ===== APP PRINCIPAL ===== */
++  798   return (
++  799     <div className="max-w-lg mx-auto p-4 pb-24">
++  800 
++  801       {/* HEADER */}
++  802       <header className="flex justify-between items-center mb-6 fade-in">
++  803         <div>
++  804           <h1 className="text-2xl font-bold text-orange-500">
++  805             Olá, {user.name ? user.name.split(' ')[0] : 'Usuário'}! 🐾
++  806           </h1>
++  807           <p className="text-gray-500 text-sm">
++  808             {pets.length} pet(s) cadastrado(s)
++  809             {!useFirebase && <span className="ml-2 text-amber-500"><i className="fas fa-database text-xs"></i> local</span>}
++  810           </p>
++  811         </div>
++  812         <button onClick={logout} className="text-red-500 font-bold hover:bg-red-50 p-2 rounded-lg transition-colors" title="Sair">
++  813           <i className="fas fa-sign-out-alt text-lg"></i>
++  814         </button>
++  815       </header>
++  816 
++  817       {/* BANNER DE NOTIFICAÇÕES */}
++  818       {"Notification" in window && Notification.permission !== "granted" && (
++  819         <Card className="mb-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
++  820           <div className="flex items-center justify-between">
++  821             <div className="flex items-center gap-3">
++  822               <i className="fas fa-bell text-xl"></i>
++  823               <div>
++  824                 <p className="font-bold">Notificações</p>
++  825                 <p className="text-sm opacity-80">Receba lembretes dos cuidados</p>
++  826               </div>
++  827             </div>
++  828             <button onClick={enableNotifications} className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg font-semibold transition-colors">
++  829               Ativar
++  830             </button>
++  831           </div>
++  832         </Card>
++  833       )}
++  834 
++  835       {/* ABAS */}
++  836       <div className="flex gap-2 mb-4 overflow-x-auto">
++  837         {[
++  838           { id: 'pets', icon: 'fas fa-paw', label: 'Pets' },
++  839           { id: 'events', icon: 'fas fa-calendar', label: 'Agenda' },
++  840           { id: 'health', icon: 'fas fa-heartbeat', label: 'Saúde' }
++  841         ].map(tab => (
++  842           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
++  843             className={`flex items-center gap-2 px-4 py-3 rounded-xl font-semibold whitespace-nowrap transition-all ${
++  844               activeTab === tab.id ? 'bg-orange-500 text-white shadow-lg' : 'bg-white text-gray-600 hover:bg-gray-100'
++  845             }`}>
++  846             <i className={tab.icon}></i> {tab.label}
++  847           </button>
++  848         ))}
++  849       </div>
++  850 
++  851       {/* ========== ABA: PETS ========== */}
++  852       {activeTab === 'pets' && (
++  853         <div className="space-y-4 fade-in">
++  854           <div className="flex justify-between items-center">
++  855             <h2 className="text-lg font-bold text-gray-800">Meus Pets</h2>
++  856             <button onClick={() => setShowAddPet(true)}
++  857               className="bg-orange-500 text-white px-4 py-2 rounded-xl font-semibold hover:bg-orange-600 transition-colors">
++  858               <i className="fas fa-plus mr-2"></i>Adicionar
++  859             </button>
++  860           </div>
++  861 
++  862           {pets.length === 0 ? (
++  863             <Card className="text-center py-10">
++  864               <div className="text-6xl mb-4">🐾</div>
++  865               <p className="text-gray-500 font-semibold">Nenhum pet cadastrado</p>
++  866               <p className="text-gray-400 text-sm">Adicione seu primeiro pet!</p>
++  867             </Card>
++  868           ) : (
++  869             pets.map(pet => (
++  870               <Card key={pet.id}
++  871                 className={`pet-card cursor-pointer ${selectedPetId === pet.id ? 'ring-2 ring-orange-500 bg-orange-50/50' : ''}`}
++  872                 onClick={() => setSelectedPetId(pet.id)}>
++  873                 <div className="flex items-center gap-4">
++  874                   <div className="relative">
++  875                     <img src={pet.avatar} alt={pet.name} className="w-16 h-16 rounded-full bg-orange-100"
++  876                       onError={(e) => { e.target.style.display = 'none'; }} />
++  877                     <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center text-3xl absolute inset-0 -z-10">
++  878                       {getSpeciesIcon(pet.species)}
++  879                     </div>
++  880                   </div>
++  881                   <div className="flex-1 min-w-0">
++  882                     <h3 className="font-bold text-lg text-gray-800">{getSpeciesIcon(pet.species)} {pet.name}</h3>
++  883                     <p className="text-gray-500 text-sm">
++  884                       {pet.breed || getSpeciesLabel(pet.species)}
++  885                       {pet.age ? ` • ${pet.age} anos` : ''}
++  886                       {pet.weight ? ` • ${pet.weight}kg` : ''}
++  887                     </p>
++  888                     <p className="text-gray-400 text-xs mt-1">
++  889                       {(pet.healthRecords || []).length} registro(s) de saúde
++  890                     </p>
++  891                   </div>
++  892                   <div className="flex flex-col gap-1">
++  893                     <button onClick={(e) => { e.stopPropagation(); setEditingPet(pet); }}
++  894                       className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors" title="Editar">
++  895                       <i className="fas fa-edit"></i>
++  896                     </button>
++  897                     <button onClick={(e) => { e.stopPropagation(); deletePet(pet); }}
++  898                       className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Excluir">
++  899                       <i className="fas fa-trash"></i>
++  900                     </button>
++  901                   </div>
++  902                 </div>
++  903               </Card>
++  904             ))
++  905           )}
++  906         </div>
++  907       )}
++  908 
++  909       {/* ========== ABA: AGENDA ========== */}
++  910       {activeTab === 'events' && (
++  911         <div className="space-y-4 fade-in">
++  912           {currentPet ? (
++  913             <>
++  914               <div className="flex justify-between items-center">
++  915                 <h2 className="text-lg font-bold text-gray-800">Agenda de {currentPet.name}</h2>
++  916                 <button onClick={() => setShowAddEvent(true)}
++  917                   className="bg-blue-500 text-white px-4 py-2 rounded-xl font-semibold hover:bg-blue-600 transition-colors">
++  918                   <i className="fas fa-plus mr-2"></i>Agendar
++  919                 </button>
++  920               </div>
++  921 
++  922               {getPetEvents().length === 0 ? (
++  923                 <Card className="text-center py-10">
++  924                   <div className="text-6xl mb-4">📅</div>
++  925                   <p className="text-gray-500 font-semibold">Nenhum evento agendado</p>
++  926                   <p className="text-gray-400 text-sm">Agende vacinas, consultas e mais!</p>
++  927                 </Card>
++  928               ) : (
++  929                 getPetEvents().map(event => (
++  930                   <Card key={event.id} className={event.completed ? 'opacity-60 bg-gray-50' : ''}>
++  931                     <div className="flex items-center gap-3">
++  932                       <div className="text-2xl">{getEventTypeIcon(event.type)}</div>
++  933                       <div className="flex-1 min-w-0">
++  934                         <p className={`font-semibold ${event.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}>
++  935                           {event.description}
++  936                         </p>
++  937                         <p className="text-gray-500 text-sm">
++  938                           {new Date(event.date + 'T00:00:00').toLocaleDateString('pt-BR')} às {event.time}
++  939                         </p>
++  940                       </div>
++  941                       <div className="flex items-center gap-1">
++  942                         <button onClick={() => toggleEventComplete(event)}
++  943                           className={`p-2 rounded-lg transition-colors ${event.completed ? 'text-green-500' : 'text-gray-300 hover:text-green-500'}`}
++  944                           title={event.completed ? "Desmarcar" : "Concluir"}>
++  945                           <i className={`fas ${event.completed ? 'fa-check-circle' : 'fa-circle'} text-lg`}></i>
++  946                         </button>
++  947                         {!event.completed && (
++  948                           <button onClick={() => setEditingEvent(event)}
++  949                             className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors" title="Editar">
++  950                             <i className="fas fa-edit"></i>
++  951                           </button>
++  952                         )}
++  953                         <button onClick={() => deleteEvent(event)}
++  954                           className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Excluir">
++  955                           <i className="fas fa-trash"></i>
++  956                         </button>
++  957                       </div>
++  958                     </div>
++  959                   </Card>
++  960                 ))
++  961               )}
++  962             </>
++  963           ) : (
++  964             <Card className="text-center py-10 bg-yellow-50/80 border border-yellow-200">
++  965               <div className="text-5xl mb-3">👆</div>
++  966               <p className="text-yellow-700 font-semibold">Selecione um pet primeiro</p>
++  967               <p className="text-yellow-600 text-sm mt-1">Vá até a aba "Pets" e selecione um para ver a agenda</p>
++  968             </Card>
++  969           )}
++  970         </div>
++  971       )}
++  972 
++  973       {/* ========== ABA: SAÚDE ========== */}
++  974       {activeTab === 'health' && (
++  975         <div className="space-y-4 fade-in">
++  976           {currentPet ? (
++  977             <>
++  978               <div className="flex justify-between items-center">
++  979                 <h2 className="text-lg font-bold text-gray-800">Saúde de {currentPet.name}</h2>
++  980                 <button onClick={() => setShowAddHealth(true)}
++  981                   className="bg-green-500 text-white px-4 py-2 rounded-xl font-semibold hover:bg-green-600 transition-colors">
++  982                   <i className="fas fa-plus mr-2"></i>Registrar
++  983                 </button>
++  984               </div>
++  985 
++  986               {(!currentPet.healthRecords || currentPet.healthRecords.length === 0) ? (
++  987                 <Card className="text-center py-10">
++  988                   <div className="text-6xl mb-4">💊</div>
++  989                   <p className="text-gray-500 font-semibold">Nenhum registro de saúde</p>
++  990                   <p className="text-gray-400 text-sm">Registre vacinas, consultas e exames</p>
++  991                 </Card>
++  992               ) : (
++  993                 currentPet.healthRecords.map(record => (
++  994                   <Card key={record.id} className="border-l-4 border-green-500">
++  995                     <div className="flex justify-between items-start">
++  996                       <div>
++  997                         <p className="font-semibold text-gray-800">
++  998                           {getHealthTypeIcon(record.type)} {record.description}
++  999                         </p>
++ 1000                         <p className="text-gray-500 text-sm">{record.date}</p>
++ 1001                       </div>
++ 1002                       <button onClick={() => deleteHealthRecord(record)}
++ 1003                         className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Excluir">
++ 1004                         <i className="fas fa-trash"></i>
++ 1005                       </button>
++ 1006                     </div>
++ 1007                   </Card>
++ 1008                 ))
++ 1009               )}
++ 1010             </>
++ 1011           ) : (
++ 1012             <Card className="text-center py-10 bg-yellow-50/80 border border-yellow-200">
++ 1013               <div className="text-5xl mb-3">👆</div>
++ 1014               <p className="text-yellow-700 font-semibold">Selecione um pet primeiro</p>
++ 1015               <p className="text-yellow-600 text-sm mt-1">Vá até a aba "Pets" e selecione um para ver o histórico</p>
++ 1016             </Card>
++ 1017           )}
++ 1018         </div>
++ 1019       )}
++ 1020 
++ 1021       {/* ========== MODAIS ========== */}
++ 1022 
++ 1023       {/* Adicionar Pet */}
++ 1024       <Modal isOpen={showAddPet} onClose={() => setShowAddPet(false)} title="Adicionar Pet">
++ 1025         <form onSubmit={addPet} className="space-y-4">
++ 1026           <Input name="name" label="Nome do Pet" placeholder="Ex: Rex" required />
++ 1027           <Input name="breed" label="Raça" placeholder="Ex: Golden Retriever" />
++ 1028           <Input name="age" label="Idade (anos)" type="number" placeholder="Ex: 3" />
++ 1029           <Input name="weight" label="Peso (kg)" type="number" placeholder="Ex: 25" />
++ 1030           <div>
++ 1031             <label className="block text-sm font-semibold text-gray-700 mb-1">Espécie</label>
++ 1032             <select name="species" className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none">
++ 1033               <option value="dog">🐕 Cachorro</option>
++ 1034               <option value="cat">🐱 Gato</option>
++ 1035               <option value="other">🐾 Outro</option>
++ 1036             </select>
++ 1037           </div>
++ 1038           <div className="flex gap-3 pt-4">
++ 1039             <Button variant="secondary" onClick={() => setShowAddPet(false)} className="flex-1">Cancelar</Button>
++ 1040             <Button type="submit" className="flex-1">Adicionar</Button>
++ 1041           </div>
++ 1042         </form>
++ 1043       </Modal>
++ 1044 
++ 1045       {/* Editar Pet */}
++ 1046       <Modal isOpen={!!editingPet} onClose={() => setEditingPet(null)} title="Editar Pet">
++ 1047         {editingPet && (
++ 1048           <form key={editingPet.id} onSubmit={updatePet} className="space-y-4">
++ 1049             <Input name="name" label="Nome do Pet" defaultValue={editingPet.name} required />
++ 1050             <Input name="breed" label="Raça" defaultValue={editingPet.breed} />
++ 1051             <Input name="age" label="Idade (anos)" type="number" defaultValue={editingPet.age} />
++ 1052             <Input name="weight" label="Peso (kg)" type="number" defaultValue={editingPet.weight} />
++ 1053             <div>
++ 1054               <label className="block text-sm font-semibold text-gray-700 mb-1">Espécie</label>
++ 1055               <select name="species" defaultValue={editingPet.species} className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none">
++ 1056                 <option value="dog">🐕 Cachorro</option>
++ 1057                 <option value="cat">🐱 Gato</option>
++ 1058                 <option value="other">🐾 Outro</option>
++ 1059               </select>
++ 1060             </div>
++ 1061             <div className="flex gap-3 pt-4">
++ 1062               <Button variant="secondary" onClick={() => setEditingPet(null)} className="flex-1">Cancelar</Button>
++ 1063               <Button type="submit" variant="info" className="flex-1">Salvar</Button>
++ 1064             </div>
++ 1065           </form>
++ 1066         )}
++ 1067       </Modal>
++ 1068 
++ 1069       {/* Adicionar Evento */}
++ 1070       <Modal isOpen={showAddEvent} onClose={() => setShowAddEvent(false)} title="Agendar Evento">
++ 1071         <form onSubmit={addEvent} className="space-y-4">
++ 1072           <Input name="description" label="Descrição" placeholder="Ex: Vacina antirrábica" required />
++ 1073           <Input name="date" label="Data" type="date" required />
++ 1074           <Input name="time" label="Horário" type="time" required />
++ 1075           <div>
++ 1076             <label className="block text-sm font-semibold text-gray-700 mb-1">Tipo</label>
++ 1077             <select name="type" className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
++ 1078               <option value="vacina">💉 Vacina</option>
++ 1079               <option value="consulta">🩺 Consulta</option>
++ 1080               <option value="banho">🛁 Banho</option>
++ 1081               <option value="outro">📌 Outro</option>
++ 1082             </select>
++ 1083           </div>
++ 1084           <div className="flex gap-3 pt-4">
++ 1085             <Button variant="secondary" onClick={() => setShowAddEvent(false)} className="flex-1">Cancelar</Button>
++ 1086             <Button type="submit" variant="info" className="flex-1">Agendar</Button>
++ 1087           </div>
++ 1088         </form>
++ 1089       </Modal>
++ 1090 
++ 1091       {/* Editar Evento */}
++ 1092       <Modal isOpen={!!editingEvent} onClose={() => setEditingEvent(null)} title="Editar Evento">
++ 1093         {editingEvent && (
++ 1094           <form key={editingEvent.id} onSubmit={updateEvent} className="space-y-4">
++ 1095             <Input name="description" label="Descrição" defaultValue={editingEvent.description} required />
++ 1096             <Input name="date" label="Data" type="date" defaultValue={editingEvent.date} required />
++ 1097             <Input name="time" label="Horário" type="time" defaultValue={editingEvent.time} required />
++ 1098             <div>
++ 1099               <label className="block text-sm font-semibold text-gray-700 mb-1">Tipo</label>
++ 1100               <select name="type" defaultValue={editingEvent.type} className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
++ 1101                 <option value="vacina">💉 Vacina</option>
++ 1102                 <option value="consulta">🩺 Consulta</option>
++ 1103                 <option value="banho">🛁 Banho</option>
++ 1104                 <option value="outro">📌 Outro</option>
++ 1105               </select>
++ 1106             </div>
++ 1107             <div className="flex gap-3 pt-4">
++ 1108               <Button variant="secondary" onClick={() => setEditingEvent(null)} className="flex-1">Cancelar</Button>
++ 1109               <Button type="submit" variant="info" className="flex-1">Salvar</Button>
++ 1110             </div>
++ 1111           </form>
++ 1112         )}
++ 1113       </Modal>
++ 1114 
++ 1115       {/* Registrar Saúde */}
++ 1116       <Modal isOpen={showAddHealth} onClose={() => setShowAddHealth(false)} title="Registrar Saúde">
++ 1117         <form onSubmit={addHealthRecord} className="space-y-4">
++ 1118           <Input name="description" label="Descrição" placeholder="Ex: Consulta de rotina" required />
++ 1119           <div>
++ 1120             <label className="block text-sm font-semibold text-gray-700 mb-1">Tipo</label>
++ 1121             <select name="type" className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none">
++ 1122               <option value="consulta">🩺 Consulta</option>
++ 1123               <option value="vacina">💉 Vacina</option>
++ 1124               <option value="exame">🔬 Exame</option>
++ 1125               <option value="tratamento">💊 Tratamento</option>
++ 1126               <option value="outro">📌 Outro</option>
++ 1127             </select>
++ 1128           </div>
++ 1129           <div className="flex gap-3 pt-4">
++ 1130             <Button variant="secondary" onClick={() => setShowAddHealth(false)} className="flex-1">Cancelar</Button>
++ 1131             <Button type="submit" variant="success" className="flex-1">Registrar</Button>
++ 1132           </div>
++ 1133         </form>
++ 1134       </Modal>
++ 1135 
++ 1136       {/* CONFIRM DIALOG */}
++ 1137       <ConfirmDialog dialog={confirmDialog} onClose={() => setConfirmDialog(null)} />
++ 1138 
++ 1139       {/* TOASTS */}
++ 1140       <ToastContainer toasts={toasts} />
++ 1141 
++ 1142       {/* NAVEGAÇÃO INFERIOR */}
++ 1143       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 safe-area-pb">
++ 1144         <div className="max-w-lg mx-auto flex justify-around">
++ 1145           {[
++ 1146             { id: 'pets', icon: 'fas fa-paw', label: 'Pets' },
++ 1147             { id: 'events', icon: 'fas fa-calendar', label: 'Agenda' },
++ 1148             { id: 'health', icon: 'fas fa-heartbeat', label: 'Saúde' }
++ 1149           ].map(tab => (
++ 1150             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
++ 1151               className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
++ 1152                 activeTab === tab.id ? 'text-orange-500' : 'text-gray-400'
++ 1153               }`}>
++ 1154               <i className={`${tab.icon} text-xl`}></i>
++ 1155               <span className="text-xs font-semibold">{tab.label}</span>
++ 1156             </button>
++ 1157           ))}
++ 1158         </div>
++ 1159       </nav>
++ 1160     </div>
++ 1161   );
++ 1162 }
++ 1163 
++ 1164 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
++ 1165 </script>
++ 1166 
++ 1167 <!-- Service Worker -->
++ 1168 <script>
++ 1169 if ('serviceWorker' in navigator) {
++ 1170   const swCode = `
++ 1171     const CACHE_NAME = 'petvida-v2';
++ 1172     const STATIC_ASSETS = ['/', '/index.html'];
++ 1173     self.addEventListener('install', e => {
++ 1174       e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS)));
++ 1175       self.skipWaiting();
++ 1176     });
++ 1177     self.addEventListener('activate', e => {
++ 1178       e.waitUntil(
++ 1179         caches.keys().then(keys =>
++ 1180           Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
++ 1181         )
++ 1182       );
++ 1183     });
++ 1184     self.addEventListener('fetch', e => {
++ 1185       e.respondWith(
++ 1186         caches.match(e.request).then(response => response || fetch(e.request))
++ 1187       );
++ 1188     });
++ 1189   `;
++ 1190   const blob = new Blob([swCode], { type: 'application/javascript' });
++ 1191   const swUrl = URL.createObjectURL(blob);
++ 1192   navigator.serviceWorker.register(swUrl)
++ 1193     .then(() => console.log("✅ Service Worker registrado"))
++ 1194     .catch(err => console.log("❌ Erro SW:", err));
++ 1195 }
++ 1196 </script>
++ 1197 
++ 1198 </body>
++ 1199 </html>
